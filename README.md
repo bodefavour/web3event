@@ -23,6 +23,7 @@ Mobile-first Expo + React Native + TypeScript foundation aligned to the "event v
 - **Design tokens** in `src/theme` for palette, typography, spacing, and radii that reflect the onboarding mock.
 - **Reusable primitives** like `ThemedText` and `AppButton` to keep styling consistent with the brand system.
 - **Hero onboarding screen** at `src/screens/OnboardingScreen.tsx` reproducing the gradient orb, glass wallet CTA, and dual buttons from Figma.
+- **Connect wallet screen** at `src/screens/ConnectWalletScreen.tsx` mirroring the wallet picker with placeholder initials ready for real icons.
 
 ## Project Structure
 
@@ -30,6 +31,7 @@ Mobile-first Expo + React Native + TypeScript foundation aligned to the "event v
 - `src/theme` — color palette, typography scale, and spacing tokens.
 - `src/components` — shared UI primitives.
 - `src/hooks` — theming helpers.
+- `src/screens` — onboarding and connect wallet flows.
 - `assets/` — placeholder directory for future imagery (keep gradients/illustrations here).
 
 ## Next Steps

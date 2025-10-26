@@ -23,18 +23,18 @@ export const OnboardingScreen = ({ onConnectWallet, onExploreEvents }: Props) =>
                         <ThemedText variant="subtitle" tone="primary">
                             event verse
                         </ThemedText>
-                                    <Pressable
-                                        accessibilityRole="button"
-                                        onPress={onConnectWallet}
-                                        style={({ pressed }) => [
-                                            styles.walletPill,
-                                            {
-                                                backgroundColor: palette.glass,
-                                                borderColor: palette.border,
-                                                opacity: pressed ? 0.85 : 1
-                                            }
-                                        ]}
-                                    >
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={onConnectWallet}
+                            style={({ pressed }) => [
+                                styles.walletPill,
+                                {
+                                    backgroundColor: palette.glass,
+                                    borderColor: palette.border,
+                                    opacity: pressed ? 0.85 : 1
+                                }
+                            ]}
+                        >
                             <ThemedText variant="caption" tone="primary">
                                 Connect Wallet
                             </ThemedText>
@@ -62,12 +62,12 @@ export const OnboardingScreen = ({ onConnectWallet, onExploreEvents }: Props) =>
                 </View>
 
                 <View style={styles.footer}>
-                                <AppButton label="Connect wallet" onPress={onConnectWallet} />
+                    <AppButton label="Connect wallet" onPress={onConnectWallet} />
                     <AppButton
                         label="Explore Events"
                         variant="secondary"
                         style={styles.secondaryButton}
-                                    onPress={onExploreEvents}
+                        onPress={onExploreEvents}
                     />
                     <View style={[styles.homeIndicator, { backgroundColor: palette.border }]} />
                 </View>
