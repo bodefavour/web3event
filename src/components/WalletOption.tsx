@@ -26,7 +26,7 @@ export const WalletOption = ({ label, accentColor, onPress }: WalletOptionProps)
       ]}
       onPress={onPress}
     >
-      <View style={[styles.iconContainer, { backgroundColor: accentColor }]}> 
+      <View style={[styles.iconContainer, { backgroundColor: accentColor }]}>
         <ThemedText variant="subtitle" tone="inverse">
           {initials}
         </ThemedText>

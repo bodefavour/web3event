@@ -23,7 +23,7 @@ export const ConnectWalletScreen = ({ onBack, onSelectWallet }: Props) => {
   const { palette } = useThemePalette();
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
       <StatusBar style="light" />
       <ScreenHeader
         title="Connect Wallet"
