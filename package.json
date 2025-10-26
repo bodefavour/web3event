@@ -11,7 +11,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@expo-google-fonts/inter": "^0.3.14",
+    "@expo-google-fonts/inter": "^0.2.4",
         "expo": "~51.0.8",
         "expo-linear-gradient": "~12.0.1",
         "expo-status-bar": "~2.0.0",
