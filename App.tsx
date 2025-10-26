@@ -20,7 +20,7 @@ export default function App() {
 
     if (!fontsLoaded) {
         return (
-            <SafeAreaView style={[styles.loadingContainer, { backgroundColor: palette.background }]}> 
+            <SafeAreaView style={[styles.loadingContainer, { backgroundColor: palette.background }]}>
                 <ActivityIndicator size="small" color={palette.primary} />
             </SafeAreaView>
         );

@@ -110,13 +110,13 @@ const styles = StyleSheet.create({
         marginTop: -24
     },
     copyBlock: {
-            marginTop: spacing.xl
+        marginTop: spacing.xl
     },
     subheading: {
-            marginTop: spacing.md,
+        marginTop: spacing.md,
         maxWidth: 280
     },
-        footer: {},
+    footer: {},
     secondaryButton: {
         marginTop: spacing.sm
     },
