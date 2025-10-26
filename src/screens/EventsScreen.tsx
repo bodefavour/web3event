@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ThemedText } from '@/components/ThemedText';
-import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
+import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 import type { EventDetail } from '@/screens/EventDetailsScreen';
@@ -12,9 +12,10 @@ type Props = {
     events: EventDetail[];
     onSelectEvent: (event: EventDetail) => void;
     onBack: () => void;
+    onTabSelect?: (tab: TabKey) => void;
 };
 
-export const EventsScreen = ({ events, onSelectEvent, onBack }: Props) => {
+export const EventsScreen = ({ events, onSelectEvent, onBack, onTabSelect }: Props) => {
     const { palette } = useThemePalette();
 
     return (
@@ -77,7 +78,7 @@ export const EventsScreen = ({ events, onSelectEvent, onBack }: Props) => {
                 )}
             />
 
-            <TabBarPlaceholder activeTab="Events" />
+            <TabBarPlaceholder activeTab="Events" onTabSelect={onTabSelect} />
         </SafeAreaView>
     );
 };

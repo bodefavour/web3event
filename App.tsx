@@ -18,6 +18,8 @@ import { DeployingScreen } from '@/screens/DeployingScreen';
 import { ReviewScreen } from '@/screens/ReviewScreen';
 import { EventsScreen } from '@/screens/EventsScreen';
 import { EventDetailsScreen, EventDetail, EventTicketTier } from '@/screens/EventDetailsScreen';
+import { MyTicketsScreen, TicketItem } from '@/screens/MyTicketsScreen';
+import type { TabKey } from '@/components/TabBarPlaceholder';
 
 const EVENTS: EventDetail[] = [
     {
@@ -106,6 +108,33 @@ const EVENTS: EventDetail[] = [
     }
 ];
 
+const MY_TICKETS: TicketItem[] = [
+    {
+        id: 'ticket-tech-summit',
+        title: 'Tech Summit 2024',
+        location: 'San Francisco, CA',
+        date: 'Oct 15, 2024',
+        typeLabel: 'NFT Ticket',
+        thumbnail: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 'ticket-music-festival',
+        title: 'Music Festival',
+        location: 'Los Angeles, CA',
+        date: 'Nov 20, 2024',
+        typeLabel: 'NFT Ticket',
+        thumbnail: 'https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=600&q=80'
+    },
+    {
+        id: 'ticket-art-exhibition',
+        title: 'Art Exhibition',
+        location: 'New York, NY',
+        date: 'Sep 5, 2024',
+        typeLabel: 'NFT Ticket',
+        thumbnail: 'https://images.unsplash.com/photo-1529429617124-aee02c022350?auto=format&fit=crop&w=600&q=80'
+    }
+];
+
 export default function App() {
     const { palette } = useThemePalette();
     const [route, setRoute] = useState<
@@ -120,6 +149,7 @@ export default function App() {
         | 'review'
         | 'ticketReview'
         | 'eventDetails'
+        | 'myTickets'
     >('onboarding');
     const [connectedWallet, setConnectedWallet] = useState<string | undefined>(undefined);
     const [eventDraft, setEventDraft] = useState<CreateEventForm | null>(null);
@@ -237,8 +267,35 @@ export default function App() {
             event: selectedEvent,
             ticket: selectedTicketTier
         });
-        setRoute('events');
+        setRoute('myTickets');
     }, [selectedEvent, selectedTicketTier]);
+
+    const handleViewTicket = useCallback((ticket: TicketItem) => {
+        console.log('View ticket tapped:', ticket);
+    }, []);
+
+    const handleTabSelect = useCallback(
+        (tab: TabKey) => {
+            switch (tab) {
+                case 'Home':
+                    setRoute('welcome');
+                    break;
+                case 'Explore':
+                case 'Events':
+                    setRoute('events');
+                    break;
+                case 'Tickets':
+                    setRoute('myTickets');
+                    break;
+                case 'Profile':
+                    console.log('Profile tab selected');
+                    break;
+                default:
+                    break;
+            }
+        },
+        []
+    );
 
     const totalTickets = ticketDraft?.reduce((sum, ticket) => sum + (parseInt(ticket.quantity, 10) || 0), 0) ?? 0;
     const rawPrimaryPrice = ticketDraft?.[0]?.price?.trim();
@@ -256,12 +313,24 @@ export default function App() {
         );
     }
 
+    if (route === 'myTickets') {
+        return (
+            <MyTicketsScreen
+                tickets={MY_TICKETS}
+                onBack={handleBackToWelcome}
+                onViewTicket={handleViewTicket}
+                onTabSelect={handleTabSelect}
+            />
+        );
+    }
+
     if (route === 'events') {
         return (
             <EventsScreen
                 events={EVENTS}
                 onSelectEvent={handleSelectEvent}
                 onBack={handleBackToWelcome}
+                onTabSelect={handleTabSelect}
             />
         );
     }
@@ -277,6 +346,7 @@ export default function App() {
                 activeTab="Tickets"
                 onBack={handleTicketReviewBack}
                 onPrimaryAction={handleCompletePurchase}
+                onTabSelect={handleTabSelect}
                 eventDetails={[
                     { label: 'Event', value: eventForSummary.title },
                     { label: 'Location', value: eventForSummary.location },
@@ -298,6 +368,7 @@ export default function App() {
                 event={selectedEvent ?? EVENTS[0]}
                 onBack={handleBackToEvents}
                 onBuyTickets={handleBuyTickets}
+                onTabSelect={handleTabSelect}
             />
         );
     }
@@ -310,6 +381,7 @@ export default function App() {
                 activeTab="Events"
                 onBack={handleReviewBack}
                 onPrimaryAction={handlePublishEvent}
+                onTabSelect={handleTabSelect}
                 eventDetails={[
                     { label: 'Event Type', value: eventDraft?.about || 'Tech Conference' },
                     { label: 'Location', value: eventDraft?.location || 'San Francisco, CA' },
@@ -330,6 +402,7 @@ export default function App() {
             <DeployingScreen
                 totalTickets={totalTickets || 100}
                 onContinue={handleDeployingContinue}
+                onTabSelect={handleTabSelect}
             />
         );
     }
@@ -340,13 +413,18 @@ export default function App() {
                 onBack={handleTicketTypesBack}
                 onSave={handleSaveTicketTypes}
                 initialTypes={ticketDraft ?? undefined}
+                onTabSelect={handleTabSelect}
             />
         );
     }
 
     if (route === 'createEvent') {
         return (
-            <CreateEventScreen onBack={handleBackToWelcome} onSubmit={handleCreateEvent} />
+            <CreateEventScreen
+                onBack={handleBackToWelcome}
+                onSubmit={handleCreateEvent}
+                onTabSelect={handleTabSelect}
+            />
         );
     }
 
@@ -355,6 +433,7 @@ export default function App() {
             <WelcomeScreen
                 onHostEvent={handleHostEvent}
                 onAttendEvent={handleAttendEvent}
+                onTabSelect={handleTabSelect}
             />
         );
     }
