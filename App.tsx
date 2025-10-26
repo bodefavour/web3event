@@ -10,10 +10,12 @@ import {
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { OnboardingScreen } from '@/screens/OnboardingScreen';
 import { ConnectWalletScreen } from '@/screens/ConnectWalletScreen';
+import { ProfileSetupScreen } from '@/screens/ProfileSetupScreen';
 
 export default function App() {
     const { palette } = useThemePalette();
-    const [route, setRoute] = useState<'onboarding' | 'connectWallet'>('onboarding');
+    const [route, setRoute] = useState<'onboarding' | 'connectWallet' | 'profileSetup'>('onboarding');
+    const [connectedWallet, setConnectedWallet] = useState<string | undefined>(undefined);
     const [fontsLoaded] = useFonts({
         Inter_400Regular,
         Inter_500Medium,
@@ -33,8 +35,18 @@ export default function App() {
         setRoute('onboarding');
     }, []);
 
+    const handleBackToWallet = useCallback(() => {
+        setRoute('connectWallet');
+    }, []);
+
     const handleSelectWallet = useCallback((wallet: string) => {
         console.log('Wallet selected:', wallet);
+        setConnectedWallet('0x123...456P');
+        setRoute('profileSetup');
+    }, []);
+
+    const handleCompleteProfile = useCallback(() => {
+        console.log('Profile completed');
     }, []);
 
     if (!fontsLoaded) {
@@ -42,6 +54,16 @@ export default function App() {
             <SafeAreaView style={[styles.loadingContainer, { backgroundColor: palette.background }]}>
                 <ActivityIndicator size="small" color={palette.primary} />
             </SafeAreaView>
+        );
+    }
+
+    if (route === 'profileSetup') {
+        return (
+            <ProfileSetupScreen
+                onBack={handleBackToWallet}
+                onComplete={handleCompleteProfile}
+                walletAddress={connectedWallet}
+            />
         );
     }
 

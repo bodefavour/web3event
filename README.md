@@ -27,6 +27,7 @@ Mobile-first Expo + React Native + TypeScript foundation aligned to the "event v
 - **Reusable primitives** like `ThemedText` and `AppButton` to keep styling consistent with the brand system.
 - **Hero onboarding screen** at `src/screens/OnboardingScreen.tsx` reproducing the gradient orb, glass wallet CTA, and dual buttons from Figma.
 - **Connect wallet screen** at `src/screens/ConnectWalletScreen.tsx` mirroring the wallet picker with placeholder initials ready for real icons.
+- **Profile setup screen** at `src/screens/ProfileSetupScreen.tsx` with styled inputs, social link stubs, and wallet summary following the design.
 
 ## Project Structure
 
@@ -34,7 +35,7 @@ Mobile-first Expo + React Native + TypeScript foundation aligned to the "event v
 - `src/theme` — color palette, typography scale, and spacing tokens.
 - `src/components` — shared UI primitives.
 - `src/hooks` — theming helpers.
-- `src/screens` — onboarding and connect wallet flows.
+- `src/screens` — onboarding, wallet connection, and profile setup flows.
 - `assets/` — placeholder directory for future imagery (keep gradients/illustrations here).
 
 ## Next Steps
@@ -42,8 +43,5 @@ Mobile-first Expo + React Native + TypeScript foundation aligned to the "event v
 - Hook up navigation (e.g., Expo Router) when additional screens are ready.
 - Replace the static hero gradient or shadow with exported artwork if the Figma asset requires higher fidelity.
 - Connect the top-right wallet CTA to the actual auth/onboarding flow when available.
-- Add unit or component tests as interactive behaviours grow.
-- Hook up navigation (e.g., Expo Router) when additional screens are ready.
-- Replace the static hero gradient or shadow with exported artwork if the Figma asset requires higher fidelity.
-- Connect the top-right wallet CTA to the actual auth/onboarding flow when available.
+- Wire the profile setup form to real data models and wallet metadata.
 - Add unit or component tests as interactive behaviours grow.
