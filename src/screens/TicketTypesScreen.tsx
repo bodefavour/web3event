@@ -13,7 +13,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { InputField } from '@/components/InputField';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
+import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 
@@ -29,9 +29,10 @@ type Props = {
     onBack: () => void;
     onSave: (ticketTypes: TicketTypeForm[]) => void;
     initialTypes?: TicketTypeForm[];
+    onTabSelect?: (tab: TabKey) => void;
 };
 
-export const TicketTypesScreen = ({ onBack, onSave, initialTypes }: Props) => {
+export const TicketTypesScreen = ({ onBack, onSave, initialTypes, onTabSelect }: Props) => {
     const { palette } = useThemePalette();
     const defaults = useMemo<TicketTypeForm[]>(
         () =>
@@ -123,7 +124,7 @@ export const TicketTypesScreen = ({ onBack, onSave, initialTypes }: Props) => {
                 <AppButton label="Save Ticket Types" onPress={handleSave} style={styles.saveButton} />
             </ScrollView>
 
-            <TabBarPlaceholder activeTab="Tickets" />
+            <TabBarPlaceholder activeTab="Tickets" onTabSelect={onTabSelect} />
         </SafeAreaView>
     );
 };

@@ -22,6 +22,7 @@ type Props = {
     title?: string;
     ctaLabel?: string;
     activeTab?: TabKey;
+    onTabSelect?: (tab: TabKey) => void;
 };
 
 export const ReviewScreen = ({
@@ -32,7 +33,8 @@ export const ReviewScreen = ({
     ticketConfiguration,
     title = 'Review',
     ctaLabel = 'Publish Event',
-    activeTab = 'Events'
+    activeTab = 'Events',
+    onTabSelect
 }: Props) => {
     const { palette } = useThemePalette();
 
@@ -116,7 +118,7 @@ export const ReviewScreen = ({
                 <AppButton label={ctaLabel} onPress={onPrimaryAction} />
             </ScrollView>
 
-            <TabBarPlaceholder activeTab={activeTab} />
+            <TabBarPlaceholder activeTab={activeTab} onTabSelect={onTabSelect} />
         </SafeAreaView>
     );
 };

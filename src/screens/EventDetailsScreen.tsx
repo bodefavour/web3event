@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
+import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 
@@ -34,6 +34,7 @@ type Props = {
     onBack: () => void;
     onBuyTickets: (tier?: EventTicketTier) => void;
     event?: EventDetail;
+    onTabSelect?: (tab: TabKey) => void;
 };
 
 const DEFAULT_EVENT: EventDetail = {
@@ -65,7 +66,7 @@ const DEFAULT_EVENT: EventDetail = {
     category: 'Tech Conference'
 };
 
-export const EventDetailsScreen = ({ onBack, onBuyTickets, event }: Props) => {
+export const EventDetailsScreen = ({ onBack, onBuyTickets, event, onTabSelect }: Props) => {
     const { palette } = useThemePalette();
     const currentEvent = event ?? DEFAULT_EVENT;
 
@@ -164,7 +165,7 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets, event }: Props) => {
                 <AppButton label="Buy Tickets" onPress={() => onBuyTickets(currentEvent.ticketTiers[0])} />
             </View>
 
-            <TabBarPlaceholder activeTab="Events" />
+            <TabBarPlaceholder activeTab="Events" onTabSelect={onTabSelect} />
         </SafeAreaView>
     );
 };

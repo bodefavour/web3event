@@ -27,7 +27,7 @@ export const MyTicketsScreen = ({ tickets, onBack, onViewTicket, onTabSelect }: 
     const { palette } = useThemePalette();
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <ScreenHeader
                 title="My Tickets"
@@ -50,7 +50,7 @@ export const MyTicketsScreen = ({ tickets, onBack, onViewTicket, onTabSelect }: 
                 contentContainerStyle={[styles.listContent, { paddingBottom: spacing['2xl'] }]}
                 ItemSeparatorComponent={() => <View style={{ height: spacing.lg }} />}
                 renderItem={({ item }) => (
-                    <View style={[styles.ticketCard, { backgroundColor: palette.surface, borderColor: palette.border }]}> 
+                    <View style={[styles.ticketCard, { backgroundColor: palette.surface, borderColor: palette.border }]}>
                         <View style={styles.ticketInfo}>
                             <ThemedText variant="caption" tone="muted" style={styles.ticketType}>
                                 {item.typeLabel}

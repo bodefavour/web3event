@@ -5,7 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { InputField } from '@/components/InputField';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
+import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing } from '@/theme';
 
@@ -20,9 +20,10 @@ export type CreateEventForm = {
 type Props = {
     onBack: () => void;
     onSubmit: (form: CreateEventForm) => void;
+    onTabSelect?: (tab: TabKey) => void;
 };
 
-export const CreateEventScreen = ({ onBack, onSubmit }: Props) => {
+export const CreateEventScreen = ({ onBack, onSubmit, onTabSelect }: Props) => {
     const { palette } = useThemePalette();
     const [form, setForm] = useState<CreateEventForm>({
         name: '',
@@ -100,7 +101,7 @@ export const CreateEventScreen = ({ onBack, onSubmit }: Props) => {
                 <AppButton label="Create Event" onPress={handleSubmit} style={styles.submitButton} />
             </ScrollView>
 
-            <TabBarPlaceholder activeTab="Events" />
+            <TabBarPlaceholder activeTab="Events" onTabSelect={onTabSelect} />
         </SafeAreaView>
     );
 };

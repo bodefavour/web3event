@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { ThemedText } from '@/components/ThemedText';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
+import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 import { Feather } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ type Props = {
     blockchain?: string;
     contractAddress?: string;
     totalTickets?: number;
+    onTabSelect?: (tab: TabKey) => void;
 };
 
 export const DeployingScreen = ({
@@ -22,7 +23,8 @@ export const DeployingScreen = ({
     totalSteps = 4,
     blockchain = 'Ethereum',
     contractAddress = '0x1a2b3c4d5e6f7890',
-    totalTickets = 100
+    totalTickets = 100,
+    onTabSelect
 }: Props) => {
     const { palette } = useThemePalette();
     const progress = Math.min(step / totalSteps, 1);
@@ -101,7 +103,7 @@ export const DeployingScreen = ({
                 <AppButton label="View Transaction" onPress={onContinue} />
             </View>
 
-            <TabBarPlaceholder activeTab="Tickets" />
+            <TabBarPlaceholder activeTab="Tickets" onTabSelect={onTabSelect} />
         </SafeAreaView>
     );
 };
