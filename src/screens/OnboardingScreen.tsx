@@ -6,7 +6,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { radii, spacing } from '@/theme';
 
-export const OnboardingScreen = () => {
+type Props = {
+    onConnectWallet: () => void;
+    onExploreEvents: () => void;
+};
+
+export const OnboardingScreen = ({ onConnectWallet, onExploreEvents }: Props) => {
     const { palette } = useThemePalette();
 
     return (
@@ -18,17 +23,18 @@ export const OnboardingScreen = () => {
                         <ThemedText variant="subtitle" tone="primary">
                             event verse
                         </ThemedText>
-                        <Pressable
-                            accessibilityRole="button"
-                            style={({ pressed }) => [
-                                styles.walletPill,
-                                {
-                                    backgroundColor: palette.glass,
-                                    borderColor: palette.border,
-                                    opacity: pressed ? 0.85 : 1
-                                }
-                            ]}
-                        >
+                                    <Pressable
+                                        accessibilityRole="button"
+                                        onPress={onConnectWallet}
+                                        style={({ pressed }) => [
+                                            styles.walletPill,
+                                            {
+                                                backgroundColor: palette.glass,
+                                                borderColor: palette.border,
+                                                opacity: pressed ? 0.85 : 1
+                                            }
+                                        ]}
+                                    >
                             <ThemedText variant="caption" tone="primary">
                                 Connect Wallet
                             </ThemedText>
@@ -56,12 +62,12 @@ export const OnboardingScreen = () => {
                 </View>
 
                 <View style={styles.footer}>
-                    <AppButton label="Connect wallet" onPress={() => { }} />
+                                <AppButton label="Connect wallet" onPress={onConnectWallet} />
                     <AppButton
                         label="Explore Events"
                         variant="secondary"
                         style={styles.secondaryButton}
-                        onPress={() => { }}
+                                    onPress={onExploreEvents}
                     />
                     <View style={[styles.homeIndicator, { backgroundColor: palette.border }]} />
                 </View>
