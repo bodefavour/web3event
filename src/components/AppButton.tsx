@@ -29,11 +29,11 @@ export const AppButton = ({
             variant === 'primary'
                 ? { backgroundColor: pressed ? palette.primaryHover : palette.primary }
                 : {
-                        backgroundColor: 'transparent',
-                        borderWidth: 1,
-                        borderColor: palette.border,
-                        opacity: pressed ? 0.85 : 1
-                    }
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderColor: palette.border,
+                    opacity: pressed ? 0.85 : 1
+                }
         ];
 
         const customStyle =
