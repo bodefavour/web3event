@@ -1,22 +1,49 @@
-const light = {
-    background: '#FFFFFF',
-    surface: '#F5F7FA',
-    textPrimary: '#101828',
-    textSecondary: '#475467',
-    accent: '#7F56D9'
+export type ThemePalette = {
+    background: string;
+    surface: string;
+    card: string;
+    textPrimary: string;
+    textMuted: string;
+    textOnPrimary: string;
+    primary: string;
+    primaryHover: string;
+    border: string;
+    glass: string;
+    heroGradient: string[];
+    heroShadow: string;
 };
 
-const dark = {
-    background: '#070417',
-    surface: '#14121F',
-    textPrimary: '#F2F4F7',
-    textSecondary: '#D0D5DD',
-    accent: '#9E77ED'
+const light: ThemePalette = {
+    background: '#F8FAFF',
+    surface: '#FFFFFF',
+    card: '#F1F5FF',
+    textPrimary: '#101828',
+    textMuted: '#475467',
+    textOnPrimary: '#FFFFFF',
+    primary: '#3F5CFF',
+    primaryHover: '#536EFF',
+    border: 'rgba(16, 24, 40, 0.12)',
+    glass: 'rgba(16, 24, 40, 0.04)',
+    heroGradient: ['rgba(137, 108, 255, 0.95)', 'rgba(137, 108, 255, 0.45)'],
+    heroShadow: 'rgba(137, 108, 255, 0.32)'
+};
+
+const dark: ThemePalette = {
+    background: '#05020E',
+    surface: '#080418',
+    card: '#101024',
+    textPrimary: '#FFFFFF',
+    textMuted: 'rgba(255, 255, 255, 0.64)',
+    textOnPrimary: '#FFFFFF',
+    primary: '#3F5CFF',
+    primaryHover: '#536EFF',
+    border: 'rgba(255, 255, 255, 0.16)',
+    glass: 'rgba(255, 255, 255, 0.06)',
+    heroGradient: ['rgba(123, 92, 255, 0.9)', 'rgba(123, 92, 255, 0.35)'],
+    heroShadow: 'rgba(46, 17, 120, 0.55)'
 };
 
 export const palette = {
     light,
     dark
 };
-
-export type ThemePalette = typeof palette.light;
