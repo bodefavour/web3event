@@ -8,35 +8,66 @@ import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 
-type TicketTier = {
+export type EventTicketTier = {
     id: string;
     label: string;
     description: string;
     price: string;
 };
 
-const TICKET_TIERS: TicketTier[] = [
-    {
-        id: 'general',
-        label: 'General Admission',
-        description: 'Access to all sessions and workshops',
-        price: '$199'
-    },
-    {
-        id: 'vip',
-        label: 'VIP Pass',
-        description: 'Includes VIP lounge access and exclusive networking',
-        price: '$399'
-    }
-];
+export type EventDetail = {
+    id: string;
+    title: string;
+    description: string;
+    date: string;
+    time: string;
+    location: string;
+    heroImage: string;
+    organizerName: string;
+    organizerCompany: string;
+    organizerAvatar: string;
+    ticketTiers: EventTicketTier[];
+    category?: string;
+};
 
 type Props = {
     onBack: () => void;
-    onBuyTickets: (tier?: TicketTier) => void;
+    onBuyTickets: (tier?: EventTicketTier) => void;
+    event?: EventDetail;
 };
 
-export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
+const DEFAULT_EVENT: EventDetail = {
+    id: 'default',
+    title: 'Web3 Tech Innovators Summit',
+    description:
+        'Join us for an immersive summit exploring the latest trends in technology and web3, featuring keynote speakers, workshops, and networking opportunities.',
+    date: 'October 26, 2024',
+    time: '9:00 AM - 5:00 PM',
+    location: 'Innovation Hub, 123 Tech Drive, San Francisco, CA',
+    heroImage: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1200&q=80',
+    organizerName: 'Organized by',
+    organizerCompany: 'Tech Events Co.',
+    organizerAvatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=240&q=80',
+    ticketTiers: [
+        {
+            id: 'general',
+            label: 'General Admission',
+            description: 'Access to all sessions and workshops',
+            price: '$199'
+        },
+        {
+            id: 'vip',
+            label: 'VIP Pass',
+            description: 'Includes VIP lounge access and exclusive networking',
+            price: '$399'
+        }
+    ],
+    category: 'Tech Conference'
+};
+
+export const EventDetailsScreen = ({ onBack, onBuyTickets, event }: Props) => {
     const { palette } = useThemePalette();
+    const currentEvent = event ?? DEFAULT_EVENT;
 
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
@@ -56,18 +87,16 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
                 showsVerticalScrollIndicator={false}
             >
                 <Image
-                    source={{
-                        uri: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1200&q=80'
-                    }}
+                    source={{ uri: currentEvent.heroImage }}
                     style={[styles.heroImage, { borderColor: palette.border }]}
                 />
 
                 <View style={styles.sectionSpacing}>
                     <ThemedText variant="title" tone="primary">
-                        Web3 Tech Innovators Summit
+                        {currentEvent.title}
                     </ThemedText>
                     <ThemedText variant="body" tone="muted" style={styles.bodySpacing}>
-                        Join us for an immersive summit exploring the latest trends in technology and web3, featuring keynote speakers, workshops, and networking opportunities.
+                        {currentEvent.description}
                     </ThemedText>
                 </View>
 
@@ -76,7 +105,7 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
                         Date and Time
                     </ThemedText>
                     <ThemedText variant="body" tone="primary">
-                        October 26, 2024 · 9:00 AM - 5:00 PM
+                        {currentEvent.date} · {currentEvent.time}
                     </ThemedText>
                 </View>
 
@@ -85,7 +114,7 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
                         Location
                     </ThemedText>
                     <ThemedText variant="body" tone="primary">
-                        Innovation Hub, 123 Tech Drive, San Francisco, CA
+                        {currentEvent.location}
                     </ThemedText>
                 </View>
 
@@ -95,17 +124,15 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
                     </ThemedText>
                     <View style={styles.organizerRow}>
                         <Image
-                            source={{
-                                uri: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=240&q=80'
-                            }}
+                            source={{ uri: currentEvent.organizerAvatar }}
                             style={[styles.organizerAvatar, { borderColor: palette.border }]}
                         />
                         <View>
                             <ThemedText variant="body" tone="primary">
-                                Organized by
+                                {currentEvent.organizerName}
                             </ThemedText>
                             <ThemedText variant="body" tone="muted">
-                                Tech Events Co.
+                                {currentEvent.organizerCompany}
                             </ThemedText>
                         </View>
                     </View>
@@ -115,7 +142,7 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
                     <ThemedText variant="subtitle" tone="primary" style={styles.sectionHeading}>
                         Tickets
                     </ThemedText>
-                    {TICKET_TIERS.map((tier) => (
+                    {currentEvent.ticketTiers.map((tier) => (
                         <View key={tier.id} style={[styles.ticketCard, { backgroundColor: palette.surface, borderColor: palette.border }]}>
                             <View style={styles.ticketText}>
                                 <ThemedText variant="body" tone="primary">
@@ -134,7 +161,7 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
             </ScrollView>
 
             <View style={styles.ctaContainer}>
-                <AppButton label="Buy Tickets" onPress={() => onBuyTickets(TICKET_TIERS[0])} />
+                <AppButton label="Buy Tickets" onPress={() => onBuyTickets(currentEvent.ticketTiers[0])} />
             </View>
 
             <TabBarPlaceholder activeTab="Events" />

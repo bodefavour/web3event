@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing } from '@/theme';
 
-type TabKey = 'Home' | 'Explore' | 'Events' | 'Tickets' | 'Profile';
+export type TabKey = 'Home' | 'Explore' | 'Events' | 'Tickets' | 'Profile';
 
 type TabItem = {
     key: TabKey;

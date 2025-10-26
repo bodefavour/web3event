@@ -16,7 +16,95 @@ import { CreateEventScreen, CreateEventForm } from '@/screens/CreateEventScreen'
 import { TicketTypesScreen, TicketTypeForm } from '@/screens/TicketTypesScreen';
 import { DeployingScreen } from '@/screens/DeployingScreen';
 import { ReviewScreen } from '@/screens/ReviewScreen';
-import { EventDetailsScreen } from '@/screens/EventDetailsScreen';
+import { EventsScreen } from '@/screens/EventsScreen';
+import { EventDetailsScreen, EventDetail, EventTicketTier } from '@/screens/EventDetailsScreen';
+
+const EVENTS: EventDetail[] = [
+    {
+        id: 'web3-summit',
+        title: 'Web3 Tech Innovators Summit',
+        description:
+            'Immerse yourself in the latest trends in web3 with keynote speakers, hands-on workshops, and curated networking sessions.',
+        date: 'Oct 26, 2025',
+        time: '9:00 AM - 5:00 PM',
+        location: 'Innovation Hub, San Francisco, CA',
+        heroImage: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1200&q=80',
+        organizerName: 'Organized by',
+        organizerCompany: 'Tech Events Co.',
+        organizerAvatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=240&q=80',
+        category: 'Tech Conference',
+        ticketTiers: [
+            {
+                id: 'summit-general',
+                label: 'General Admission',
+                description: 'Access to all sessions and workshops',
+                price: '$199'
+            },
+            {
+                id: 'summit-vip',
+                label: 'VIP Pass',
+                description: 'VIP lounge access and exclusive networking',
+                price: '$399'
+            }
+        ]
+    },
+    {
+        id: 'dao-builders',
+        title: 'DAO Builders Retreat',
+        description:
+            'A three-day retreat for DAO operators covering governance tooling, treasury strategy, and community growth playbooks.',
+        date: 'Nov 14, 2025',
+        time: '10:00 AM - 6:00 PM',
+        location: 'Calistoga Ranch, Napa Valley, CA',
+        heroImage: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80',
+        organizerName: 'Hosted by',
+        organizerCompany: 'DAO Collective',
+        organizerAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80',
+        category: 'Leadership',
+        ticketTiers: [
+            {
+                id: 'dao-standard',
+                label: 'Retreat Pass',
+                description: 'Workshops, meals, and resort access',
+                price: '$599'
+            },
+            {
+                id: 'dao-suite',
+                label: 'Executive Suite',
+                description: 'Includes private suite and concierge onboarding',
+                price: '$899'
+            }
+        ]
+    },
+    {
+        id: 'nft-art-night',
+        title: 'NFT Art Night: Metaverse Edition',
+        description:
+            'An immersive gallery experience featuring generative artists, live performances, and VR showcases of upcoming drops.',
+        date: 'Dec 02, 2025',
+        time: '7:00 PM - 11:00 PM',
+        location: 'Aurora Loft, Brooklyn, NY',
+        heroImage: 'https://images.unsplash.com/photo-1526481280695-3c4697e2e81b?auto=format&fit=crop&w=1200&q=80',
+        organizerName: 'Curated by',
+        organizerCompany: 'Metaverse Arts Guild',
+        organizerAvatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=240&q=80',
+        category: 'Experience',
+        ticketTiers: [
+            {
+                id: 'nft-general',
+                label: 'General Admission',
+                description: 'Gallery access and performances',
+                price: '$75'
+            },
+            {
+                id: 'nft-collector',
+                label: 'Collector Pass',
+                description: 'Includes artist meet-and-greet and limited print',
+                price: '$150'
+            }
+        ]
+    }
+];
 
 export default function App() {
     const { palette } = useThemePalette();
@@ -26,14 +114,18 @@ export default function App() {
         | 'profileSetup'
         | 'welcome'
         | 'createEvent'
+        | 'events'
         | 'ticketTypes'
         | 'deploying'
         | 'review'
+        | 'ticketReview'
         | 'eventDetails'
     >('onboarding');
     const [connectedWallet, setConnectedWallet] = useState<string | undefined>(undefined);
     const [eventDraft, setEventDraft] = useState<CreateEventForm | null>(null);
     const [ticketDraft, setTicketDraft] = useState<TicketTypeForm[] | null>(null);
+    const [selectedEvent, setSelectedEvent] = useState<EventDetail | null>(EVENTS[0]);
+    const [selectedTicketTier, setSelectedTicketTier] = useState<EventTicketTier | null>(EVENTS[0].ticketTiers[0]);
     const [fontsLoaded] = useFonts({
         Inter_400Regular,
         Inter_500Medium,

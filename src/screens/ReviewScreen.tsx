@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
+import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 
@@ -15,51 +15,78 @@ type SummaryItem = {
 
 type Props = {
     onBack: () => void;
-    onPublish: () => void;
+    onPrimaryAction: () => void;
     onEditItem?: (section: 'event' | 'ticket', item: SummaryItem) => void;
     eventDetails: SummaryItem[];
     ticketConfiguration: SummaryItem[];
+    title?: string;
+    ctaLabel?: string;
+    activeTab?: TabKey;
 };
 
 export const ReviewScreen = ({
     onBack,
-    onPublish,
+    onPrimaryAction,
     onEditItem,
     eventDetails,
-    ticketConfiguration
+    ticketConfiguration,
+    title = 'Review',
+    ctaLabel = 'Publish Event',
+    activeTab = 'Events'
 }: Props) => {
     const { palette } = useThemePalette();
 
-    const renderRow = (section: 'event' | 'ticket', item: SummaryItem) => (
-        <Pressable
-            key={`${section}-${item.label}`}
-            onPress={() => onEditItem?.(section, item)}
-            style={({ pressed }) => [
-                styles.row,
-                {
-                    backgroundColor: palette.surface,
-                    borderColor: palette.border,
-                    opacity: pressed ? 0.92 : 1
-                }
-            ]}
-        >
-            <View>
-                <ThemedText variant="body" tone="primary">
-                    {item.label}
-                </ThemedText>
-                <ThemedText variant="body" tone="muted" style={styles.valueText}>
-                    {item.value}
-                </ThemedText>
-            </View>
-            <Feather name="chevron-right" size={20} color={palette.textMuted} />
-        </Pressable>
-    );
+    const renderRow = (section: 'event' | 'ticket', item: SummaryItem) => {
+        const rowContent = (
+            <>
+                <View>
+                    <ThemedText variant="body" tone="primary">
+                        {item.label}
+                    </ThemedText>
+                    <ThemedText variant="body" tone="muted" style={styles.valueText}>
+                        {item.value}
+                    </ThemedText>
+                </View>
+                {onEditItem ? (
+                    <Feather name="chevron-right" size={20} color={palette.textMuted} />
+                ) : null}
+            </>
+        );
+
+        if (!onEditItem) {
+            return (
+                <View
+                    key={`${section}-${item.label}`}
+                    style={[styles.row, { backgroundColor: palette.surface, borderColor: palette.border }]}
+                >
+                    {rowContent}
+                </View>
+            );
+        }
+
+        return (
+            <Pressable
+                key={`${section}-${item.label}`}
+                onPress={() => onEditItem(section, item)}
+                style={({ pressed }) => [
+                    styles.row,
+                    {
+                        backgroundColor: palette.surface,
+                        borderColor: palette.border,
+                        opacity: pressed ? 0.92 : 1
+                    }
+                ]}
+            >
+                {rowContent}
+            </Pressable>
+        );
+    };
 
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <ScreenHeader
-                title="Review"
+                title={title}
                 leftSlot={
                     <Pressable accessibilityRole="button" onPress={onBack} style={styles.backButton}>
                         <Feather name="arrow-left" size={24} color={palette.textPrimary} />
@@ -86,10 +113,10 @@ export const ReviewScreen = ({
                     {ticketConfiguration.map((item) => renderRow('ticket', item))}
                 </View>
 
-                <AppButton label="Publish Event" onPress={onPublish} />
+                <AppButton label={ctaLabel} onPress={onPrimaryAction} />
             </ScrollView>
 
-            <TabBarPlaceholder activeTab="Events" />
+            <TabBarPlaceholder activeTab={activeTab} />
         </SafeAreaView>
     );
 };
