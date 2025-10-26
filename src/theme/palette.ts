@@ -9,7 +9,7 @@ export type ThemePalette = {
     primaryHover: string;
     border: string;
     glass: string;
-    heroGradient: string[];
+    heroGradient: readonly [string, string];
     heroShadow: string;
 };
 
@@ -24,7 +24,7 @@ const light: ThemePalette = {
     primaryHover: '#536EFF',
     border: 'rgba(16, 24, 40, 0.12)',
     glass: 'rgba(16, 24, 40, 0.04)',
-    heroGradient: ['rgba(137, 108, 255, 0.95)', 'rgba(137, 108, 255, 0.45)'],
+    heroGradient: ['rgba(137, 108, 255, 0.95)', 'rgba(137, 108, 255, 0.45)'] as const,
     heroShadow: 'rgba(137, 108, 255, 0.32)'
 };
 
@@ -39,7 +39,7 @@ const dark: ThemePalette = {
     primaryHover: '#536EFF',
     border: 'rgba(255, 255, 255, 0.16)',
     glass: 'rgba(255, 255, 255, 0.06)',
-    heroGradient: ['rgba(123, 92, 255, 0.9)', 'rgba(123, 92, 255, 0.35)'],
+    heroGradient: ['rgba(123, 92, 255, 0.9)', 'rgba(123, 92, 255, 0.35)'] as const,
     heroShadow: 'rgba(46, 17, 120, 0.55)'
 };
 
