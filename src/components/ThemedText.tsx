@@ -1,32 +1,39 @@
 import { Text, TextProps, StyleSheet } from 'react-native';
 import { ReactNode } from 'react';
 import { useThemePalette } from '@/hooks/useThemePalette';
+import { typography, TypographyVariant } from '@/theme';
 
-type ThemedTextVariant = 'title' | 'subtitle' | 'body' | 'caption';
+type Tone = 'primary' | 'muted' | 'inverse';
 
 type Props = TextProps & {
-    variant?: ThemedTextVariant;
+    variant?: TypographyVariant;
+    tone?: Tone;
     children: ReactNode;
 };
 
-const variantStyles: Record<ThemedTextVariant, { fontSize: number; fontWeight: '400' | '600' | '700'; }> = {
-    title: { fontSize: 28, fontWeight: '700' },
-    subtitle: { fontSize: 20, fontWeight: '600' },
-    body: { fontSize: 16, fontWeight: '400' },
-    caption: { fontSize: 13, fontWeight: '400' }
-};
-
-export const ThemedText = ({ variant, style, children, ...textProps }: Props) => {
+export const ThemedText = ({
+    variant = 'body',
+    tone = 'primary',
+    style,
+    children,
+    ...textProps
+}: Props) => {
     const { palette } = useThemePalette();
-    const resolvedVariant: ThemedTextVariant = variant ?? 'body';
+
+    const color =
+        tone === 'muted'
+            ? palette.textMuted
+            : tone === 'inverse'
+            ? palette.textOnPrimary
+            : palette.textPrimary;
 
     return (
         <Text
             {...textProps}
             style={[
                 styles.base,
-                { color: palette.textPrimary },
-                variantStyles[resolvedVariant],
+                typography[variant],
+                { color },
                 style
             ]}
         >
@@ -37,6 +44,6 @@ export const ThemedText = ({ variant, style, children, ...textProps }: Props) =>
 
 const styles = StyleSheet.create({
     base: {
-        fontFamily: 'System'
+        fontFamily: 'Inter_400Regular'
     }
 });
