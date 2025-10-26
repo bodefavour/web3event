@@ -18,7 +18,7 @@ export const EventsScreen = ({ events, onSelectEvent, onBack }: Props) => {
     const { palette } = useThemePalette();
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <ScreenHeader
                 title="Events"
