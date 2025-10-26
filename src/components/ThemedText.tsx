@@ -24,8 +24,8 @@ export const ThemedText = ({
         tone === 'muted'
             ? palette.textMuted
             : tone === 'inverse'
-            ? palette.textOnPrimary
-            : palette.textPrimary;
+                ? palette.textOnPrimary
+                : palette.textPrimary;
 
     return (
         <Text
