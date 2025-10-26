@@ -1,6 +1,6 @@
 # web3event
 
-Mobile-first Expo + React Native + TypeScript starter.
+Mobile-first Expo + React Native + TypeScript foundation aligned to the "event verse" onboarding concept.
 
 ## Getting Started
 
@@ -8,24 +8,33 @@ Mobile-first Expo + React Native + TypeScript starter.
    ```bash
    npm install
    ```
-2. Start the development server:
+2. Start the Expo bundler:
    ```bash
    npm run start
    ```
-3. Launch on a device or emulator:
+3. Choose a target from the Expo CLI prompt:
    - Press `a` for Android emulator
    - Press `i` for iOS simulator (macOS only)
    - Press `w` for web preview
 
+## What's in the box
+
+- **Inter typography stack** via `@expo-google-fonts/inter`, preloaded before rendering UI.
+- **Design tokens** in `src/theme` for palette, typography, spacing, and radii that reflect the onboarding mock.
+- **Reusable primitives** like `ThemedText` and `AppButton` to keep styling consistent with the brand system.
+- **Hero onboarding screen** at `src/screens/OnboardingScreen.tsx` reproducing the gradient orb, glass wallet CTA, and dual buttons from Figma.
+
 ## Project Structure
 
-- `App.tsx` — Entry point with theme-aware scaffolding ready for Figma-driven screens.
-- `src/theme` — Palette tokens to map design system colors.
-- `src/components` — Themed primitives.
-- `src/hooks` — Shared hooks including palette selection.
+- `App.tsx` — boots fonts and renders the onboarding flow once ready.
+- `src/theme` — color palette, typography scale, and spacing tokens.
+- `src/components` — shared UI primitives.
+- `src/hooks` — theming helpers.
+- `assets/` — placeholder directory for future imagery (keep gradients/illustrations here).
 
 ## Next Steps
 
-- Replace placeholder palette tokens with values from your Figma design system.
-- Add navigation (e.g., Expo Router or React Navigation) when flows are defined.
-- Wire up design assets (icons, illustrations) under `assets/`.
+- Hook up navigation (e.g., Expo Router) when additional screens are ready.
+- Replace the static hero gradient or shadow with exported artwork if the Figma asset requires higher fidelity.
+- Connect the top-right wallet CTA to the actual auth/onboarding flow when available.
+- Add unit or component tests as interactive behaviours grow.
