@@ -1,6 +1,7 @@
 # web3event
 
 Mobile-first Expo + React Native + TypeScript foundation aligned to the "event verse" onboarding concept.
+Mobile-first Expo + React Native + TypeScript foundation aligned to the "event verse" onboarding concept.
 
 ## Getting Started
 
@@ -9,9 +10,11 @@ Mobile-first Expo + React Native + TypeScript foundation aligned to the "event v
    npm install
    ```
 2. Start the Expo bundler:
+2. Start the Expo bundler:
    ```bash
    npm run start
    ```
+3. Choose a target from the Expo CLI prompt:
 3. Choose a target from the Expo CLI prompt:
    - Press `a` for Android emulator
    - Press `i` for iOS simulator (macOS only)
@@ -36,6 +39,10 @@ Mobile-first Expo + React Native + TypeScript foundation aligned to the "event v
 
 ## Next Steps
 
+- Hook up navigation (e.g., Expo Router) when additional screens are ready.
+- Replace the static hero gradient or shadow with exported artwork if the Figma asset requires higher fidelity.
+- Connect the top-right wallet CTA to the actual auth/onboarding flow when available.
+- Add unit or component tests as interactive behaviours grow.
 - Hook up navigation (e.g., Expo Router) when additional screens are ready.
 - Replace the static hero gradient or shadow with exported artwork if the Figma asset requires higher fidelity.
 - Connect the top-right wallet CTA to the actual auth/onboarding flow when available.
