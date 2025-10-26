@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { useThemePalette } from '@/hooks/useThemePalette';
@@ -21,9 +21,10 @@ const TAB_ITEMS: TabItem[] = [
 
 type Props = {
     activeTab: TabKey;
+    onTabSelect?: (tab: TabKey) => void;
 };
 
-export const TabBarPlaceholder = ({ activeTab }: Props) => {
+export const TabBarPlaceholder = ({ activeTab, onTabSelect }: Props) => {
     const { palette } = useThemePalette();
 
     return (
@@ -31,7 +32,17 @@ export const TabBarPlaceholder = ({ activeTab }: Props) => {
             {TAB_ITEMS.map(({ key, icon }) => {
                 const isActive = key === activeTab;
                 return (
-                    <View key={key} style={styles.item}>
+                    <Pressable
+                        key={key}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: isActive }}
+                        onPress={() => {
+                            if (!isActive) {
+                                onTabSelect?.(key);
+                            }
+                        }}
+                        style={({ pressed }) => [styles.item, { opacity: pressed ? 0.8 : 1 }]}
+                    >
                         <Feather
                             name={icon}
                             size={20}
@@ -44,7 +55,7 @@ export const TabBarPlaceholder = ({ activeTab }: Props) => {
                         >
                             {key}
                         </ThemedText>
-                    </View>
+                    </Pressable>
                 );
             })}
         </View>

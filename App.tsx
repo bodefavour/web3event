@@ -139,6 +139,7 @@ export default function App() {
 
     const handleExploreEvents = useCallback(() => {
         console.log('Explore events tapped');
+        setRoute('events');
     }, []);
 
     const handleBackToOnboarding = useCallback(() => {
@@ -167,11 +168,23 @@ export default function App() {
 
     const handleAttendEvent = useCallback(() => {
         console.log('Attend event selected');
-        setRoute('eventDetails');
+        setSelectedEvent(EVENTS[0]);
+        setSelectedTicketTier(EVENTS[0].ticketTiers[0]);
+        setRoute('events');
     }, []);
 
     const handleBackToWelcome = useCallback(() => {
         setRoute('welcome');
+    }, []);
+
+    const handleBackToEvents = useCallback(() => {
+        setRoute('events');
+    }, []);
+
+    const handleSelectEvent = useCallback((event: EventDetail) => {
+        setSelectedEvent(event);
+        setSelectedTicketTier(event.ticketTiers[0]);
+        setRoute('eventDetails');
     }, []);
 
     const handleCreateEvent = useCallback((form: CreateEventForm) => {
@@ -203,9 +216,29 @@ export default function App() {
         setRoute('welcome');
     }, [eventDraft, ticketDraft]);
 
-    const handleBuyTickets = useCallback(() => {
-        console.log('Buy tickets tapped');
+    const handleBuyTickets = useCallback(
+        (tier?: EventTicketTier) => {
+            const resolvedTier = tier ?? selectedEvent?.ticketTiers[0] ?? null;
+            if (resolvedTier) {
+                setSelectedTicketTier(resolvedTier);
+            }
+            console.log('Buy tickets tapped', resolvedTier);
+            setRoute('ticketReview');
+        },
+        [selectedEvent]
+    );
+
+    const handleTicketReviewBack = useCallback(() => {
+        setRoute('eventDetails');
     }, []);
+
+    const handleCompletePurchase = useCallback(() => {
+        console.log('Ticket purchased:', {
+            event: selectedEvent,
+            ticket: selectedTicketTier
+        });
+        setRoute('events');
+    }, [selectedEvent, selectedTicketTier]);
 
     const totalTickets = ticketDraft?.reduce((sum, ticket) => sum + (parseInt(ticket.quantity, 10) || 0), 0) ?? 0;
     const rawPrimaryPrice = ticketDraft?.[0]?.price?.trim();
@@ -223,17 +256,60 @@ export default function App() {
         );
     }
 
+    if (route === 'events') {
+        return (
+            <EventsScreen
+                events={EVENTS}
+                onSelectEvent={handleSelectEvent}
+                onBack={handleBackToWelcome}
+            />
+        );
+    }
+
+    if (route === 'ticketReview') {
+        const eventForSummary = selectedEvent ?? EVENTS[0];
+        const ticketForSummary = selectedTicketTier ?? eventForSummary.ticketTiers[0];
+
+        return (
+            <ReviewScreen
+                title="Review"
+                ctaLabel="Buy Tickets"
+                activeTab="Tickets"
+                onBack={handleTicketReviewBack}
+                onPrimaryAction={handleCompletePurchase}
+                eventDetails={[
+                    { label: 'Event', value: eventForSummary.title },
+                    { label: 'Location', value: eventForSummary.location },
+                    { label: 'Date', value: eventForSummary.date },
+                    { label: 'Time', value: eventForSummary.time }
+                ]}
+                ticketConfiguration={[
+                    { label: 'Ticket Type', value: ticketForSummary.label },
+                    { label: 'Price', value: ticketForSummary.price },
+                    { label: 'Quantity', value: '1' }
+                ]}
+            />
+        );
+    }
+
     if (route === 'eventDetails') {
         return (
-            <EventDetailsScreen onBack={handleBackToWelcome} onBuyTickets={handleBuyTickets} />
+            <EventDetailsScreen
+                event={selectedEvent ?? EVENTS[0]}
+                onBack={handleBackToEvents}
+                onBuyTickets={handleBuyTickets}
+            />
         );
     }
 
     if (route === 'review') {
         return (
             <ReviewScreen
+                title="Review"
+                ctaLabel="Publish Event"
+                activeTab="Events"
                 onBack={handleReviewBack}
-                onPublish={handlePublishEvent}
+                onPrimaryAction={handlePublishEvent}
                 eventDetails={[
                     { label: 'Event Type', value: eventDraft?.about || 'Tech Conference' },
                     { label: 'Location', value: eventDraft?.location || 'San Francisco, CA' },

@@ -2,16 +2,17 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { ThemedText } from '@/components/ThemedText';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder } from '@/components/TabBarPlaceholder';
+import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 
 type Props = {
     onHostEvent: () => void;
     onAttendEvent: () => void;
+    onTabSelect?: (tab: TabKey) => void;
 };
 
-export const WelcomeScreen = ({ onHostEvent, onAttendEvent }: Props) => {
+export const WelcomeScreen = ({ onHostEvent, onAttendEvent, onTabSelect }: Props) => {
     const { palette } = useThemePalette();
 
     return (
@@ -41,7 +42,7 @@ export const WelcomeScreen = ({ onHostEvent, onAttendEvent }: Props) => {
                 </View>
             </View>
 
-            <TabBarPlaceholder activeTab="Events" />
+            <TabBarPlaceholder activeTab="Events" onTabSelect={onTabSelect} />
         </SafeAreaView>
     );
 };
