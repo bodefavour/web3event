@@ -1,28 +1,28 @@
 {
-  "expo": {
-    "name": "web3event",
-    "slug": "web3event",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF"
-      }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static"
+    "expo": {
+        "name": "web3event",
+        "slug": "web3event",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "userInterfaceStyle": "automatic",
+        "splash": {
+            "resizeMode": "contain",
+            "backgroundColor": "#FFFFFF"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "backgroundColor": "#FFFFFF"
+            }
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static"
+        }
     }
-  }
 }
