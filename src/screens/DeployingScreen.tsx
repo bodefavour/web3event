@@ -28,7 +28,7 @@ export const DeployingScreen = ({
     const progress = Math.min(step / totalSteps, 1);
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <View style={styles.contentWrapper}>
                 <View>
@@ -40,7 +40,7 @@ export const DeployingScreen = ({
                             event verse
                         </ThemedText>
                     </View>
-                    <View style={[styles.progressTrack, { backgroundColor: palette.glass }]}> 
+                    <View style={[styles.progressTrack, { backgroundColor: palette.glass }]}>
                         <View
                             style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: palette.primary }]}
                         />
@@ -55,8 +55,8 @@ export const DeployingScreen = ({
                         </ThemedText>
                     </View>
 
-                    <View style={styles.cardGroup}> 
-                        <View style={[styles.cardRow, { backgroundColor: palette.surface, borderColor: palette.border }]}> 
+                    <View style={styles.cardGroup}>
+                        <View style={[styles.cardRow, { backgroundColor: palette.surface, borderColor: palette.border }]}>
                             <View style={[styles.iconBadge, { backgroundColor: palette.glass }]}>
                                 <Feather name="hexagon" size={20} color={palette.primary} />
                             </View>
@@ -69,7 +69,7 @@ export const DeployingScreen = ({
                                 </ThemedText>
                             </View>
                         </View>
-                        <View style={[styles.cardRow, { backgroundColor: palette.surface, borderColor: palette.border }]}> 
+                        <View style={[styles.cardRow, { backgroundColor: palette.surface, borderColor: palette.border }]}>
                             <View style={[styles.iconBadge, { backgroundColor: palette.glass }]}>
                                 <Feather name="hash" size={20} color={palette.primary} />
                             </View>
@@ -82,7 +82,7 @@ export const DeployingScreen = ({
                                 </ThemedText>
                             </View>
                         </View>
-                        <View style={[styles.cardRow, { backgroundColor: palette.surface, borderColor: palette.border }]}> 
+                        <View style={[styles.cardRow, { backgroundColor: palette.surface, borderColor: palette.border }]}>
                             <View style={[styles.iconBadge, { backgroundColor: palette.glass }]}>
                                 <Feather name="tag" size={20} color={palette.primary} />
                             </View>

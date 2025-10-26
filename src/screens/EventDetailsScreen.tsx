@@ -39,7 +39,7 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
     const { palette } = useThemePalette();
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <ScreenHeader
                 title="Event Details"
@@ -116,7 +116,7 @@ export const EventDetailsScreen = ({ onBack, onBuyTickets }: Props) => {
                         Tickets
                     </ThemedText>
                     {TICKET_TIERS.map((tier) => (
-                        <View key={tier.id} style={[styles.ticketCard, { backgroundColor: palette.surface, borderColor: palette.border }]}> 
+                        <View key={tier.id} style={[styles.ticketCard, { backgroundColor: palette.surface, borderColor: palette.border }]}>
                             <View style={styles.ticketText}>
                                 <ThemedText variant="body" tone="primary">
                                     {tier.label}

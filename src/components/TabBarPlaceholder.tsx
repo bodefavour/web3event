@@ -27,7 +27,7 @@ export const TabBarPlaceholder = ({ activeTab }: Props) => {
     const { palette } = useThemePalette();
 
     return (
-        <View style={[styles.container, { backgroundColor: palette.surface, borderColor: palette.border }]}> 
+        <View style={[styles.container, { backgroundColor: palette.surface, borderColor: palette.border }]}>
             {TAB_ITEMS.map(({ key, icon }) => {
                 const isActive = key === activeTab;
                 return (

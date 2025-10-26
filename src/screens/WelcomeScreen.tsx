@@ -15,7 +15,7 @@ export const WelcomeScreen = ({ onHostEvent, onAttendEvent }: Props) => {
     const { palette } = useThemePalette();
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <View style={styles.contentWrapper}>
                 <View style={styles.heroStack}>

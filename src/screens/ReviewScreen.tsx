@@ -56,7 +56,7 @@ export const ReviewScreen = ({
     );
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <ScreenHeader
                 title="Review"

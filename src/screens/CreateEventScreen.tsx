@@ -41,7 +41,7 @@ export const CreateEventScreen = ({ onBack, onSubmit }: Props) => {
     };
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}> 
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
             <StatusBar style="light" />
             <ScreenHeader
                 title="Create Event"
