@@ -5,7 +5,8 @@ import {
     StyleSheet,
     View,
     Pressable,
-    Switch
+    Switch,
+    Platform
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
@@ -13,7 +14,9 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { InputField } from '@/components/InputField';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
+import { SmartTabBar } from '@/components/SmartTabBar';
+import { TabKey } from '@/components/TabBarPlaceholder';
+import { HostTabKey } from '@/components/HostTabBar';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing, radii } from '@/theme';
 
@@ -29,10 +32,11 @@ type Props = {
     onBack: () => void;
     onSave: (ticketTypes: TicketTypeForm[]) => void;
     initialTypes?: TicketTypeForm[];
-    onTabSelect?: (tab: TabKey) => void;
+    onTabSelect?: (tab: TabKey | HostTabKey) => void;
+    userRole?: 'host' | 'attendee';
 };
 
-export const TicketTypesScreen = ({ onBack, onSave, initialTypes, onTabSelect }: Props) => {
+export const TicketTypesScreen = ({ onBack, onSave, initialTypes, onTabSelect, userRole = 'host' }: Props) => {
     const { palette } = useThemePalette();
     const defaults = useMemo<TicketTypeForm[]>(
         () =>
@@ -84,29 +88,44 @@ export const TicketTypesScreen = ({ onBack, onSave, initialTypes, onTabSelect }:
                         <ThemedText variant="title" tone="primary" style={styles.sectionTitle}>
                             Ticket Type {index + 1}
                         </ThemedText>
-                        <InputField
-                            placeholder="Ticket Name"
-                            value={ticket.name}
-                            onChangeText={(value) => handleChange(index, 'name', value)}
-                            returnKeyType="next"
-                            style={styles.field}
-                        />
-                        <InputField
-                            placeholder="Quantity"
-                            value={ticket.quantity}
-                            onChangeText={(value) => handleChange(index, 'quantity', value)}
-                            keyboardType="number-pad"
-                            returnKeyType="next"
-                            style={styles.field}
-                        />
-                        <InputField
-                            placeholder="Price"
-                            value={ticket.price}
-                            onChangeText={(value) => handleChange(index, 'price', value)}
-                            keyboardType="decimal-pad"
-                            returnKeyType="done"
-                            style={styles.field}
-                        />
+                        <View style={styles.fieldGroup}>
+                            <ThemedText variant="body" tone="primary" style={styles.label}>
+                                Ticket Name
+                            </ThemedText>
+                            <InputField
+                                placeholder=""
+                                value={ticket.name}
+                                onChangeText={(value) => handleChange(index, 'name', value)}
+                                returnKeyType="next"
+                                style={styles.field}
+                            />
+                        </View>
+                        <View style={styles.fieldGroup}>
+                            <ThemedText variant="body" tone="primary" style={styles.label}>
+                                Quantity
+                            </ThemedText>
+                            <InputField
+                                placeholder=""
+                                value={ticket.quantity}
+                                onChangeText={(value) => handleChange(index, 'quantity', value)}
+                                keyboardType="number-pad"
+                                returnKeyType="next"
+                                style={styles.field}
+                            />
+                        </View>
+                        <View style={styles.fieldGroup}>
+                            <ThemedText variant="body" tone="primary" style={styles.label}>
+                                Price
+                            </ThemedText>
+                            <InputField
+                                placeholder=""
+                                value={ticket.price}
+                                onChangeText={(value) => handleChange(index, 'price', value)}
+                                keyboardType="decimal-pad"
+                                returnKeyType="done"
+                                style={styles.field}
+                            />
+                        </View>
                         <View style={styles.switchRow}>
                             <ThemedText variant="body" tone="primary">
                                 Transferable
@@ -124,7 +143,11 @@ export const TicketTypesScreen = ({ onBack, onSave, initialTypes, onTabSelect }:
                 <AppButton label="Save Ticket Types" onPress={handleSave} style={styles.saveButton} />
             </ScrollView>
 
-            <TabBarPlaceholder activeTab="Tickets" onTabSelect={onTabSelect} />
+            <SmartTabBar
+                userRole={userRole}
+                activeTab={userRole === 'host' ? 'Create Event' : 'Tickets'}
+                onTabSelect={onTabSelect}
+            />
         </SafeAreaView>
     );
 };
@@ -140,17 +163,23 @@ const styles = StyleSheet.create({
         flex: 1
     },
     content: {
-        paddingHorizontal: spacing.xl
+        paddingHorizontal: spacing.lg,
+        paddingBottom: spacing.lg
     },
     sectionTitle: {
-        marginBottom: spacing.md
+        marginBottom: spacing.lg
     },
     ticketSectionSpacing: {
-        marginTop: spacing['2xl']
+        marginTop: spacing.xl
+    },
+    fieldGroup: {
+        marginBottom: spacing.lg
+    },
+    label: {
+        marginBottom: spacing.sm
     },
     field: {
-        borderRadius: radii.lg,
-        marginBottom: spacing.md
+        borderRadius: radii.lg
     },
     switchRow: {
         flexDirection: 'row',
@@ -159,6 +188,6 @@ const styles = StyleSheet.create({
         marginTop: spacing.sm
     },
     saveButton: {
-        marginTop: spacing['2xl']
+        marginTop: spacing.xl
     }
 });

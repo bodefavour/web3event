@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View, Pressable } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View, Pressable, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { InputField } from '@/components/InputField';
 import { AppButton } from '@/components/AppButton';
-import { TabBarPlaceholder, TabKey } from '@/components/TabBarPlaceholder';
+import { SmartTabBar } from '@/components/SmartTabBar';
+import { TabKey } from '@/components/TabBarPlaceholder';
+import { HostTabKey } from '@/components/HostTabBar';
 import { useThemePalette } from '@/hooks/useThemePalette';
-import { spacing } from '@/theme';
+import { spacing, radii } from '@/theme';
 
 export type CreateEventForm = {
     name: string;
@@ -20,10 +22,11 @@ export type CreateEventForm = {
 type Props = {
     onBack: () => void;
     onSubmit: (form: CreateEventForm) => void;
-    onTabSelect?: (tab: TabKey) => void;
+    onTabSelect?: (tab: TabKey | HostTabKey) => void;
+    userRole?: 'host' | 'attendee';
 };
 
-export const CreateEventScreen = ({ onBack, onSubmit, onTabSelect }: Props) => {
+export const CreateEventScreen = ({ onBack, onSubmit, onTabSelect, userRole = 'host' }: Props) => {
     const { palette } = useThemePalette();
     const [form, setForm] = useState<CreateEventForm>({
         name: '',
@@ -101,7 +104,11 @@ export const CreateEventScreen = ({ onBack, onSubmit, onTabSelect }: Props) => {
                 <AppButton label="Create Event" onPress={handleSubmit} style={styles.submitButton} />
             </ScrollView>
 
-            <TabBarPlaceholder activeTab="Events" onTabSelect={onTabSelect} />
+            <SmartTabBar
+                userRole={userRole}
+                activeTab={userRole === 'host' ? 'Create Event' : 'Events'}
+                onTabSelect={onTabSelect}
+            />
         </SafeAreaView>
     );
 };
@@ -117,20 +124,21 @@ const styles = StyleSheet.create({
         flex: 1
     },
     content: {
-        paddingHorizontal: spacing.xl,
-        paddingBottom: spacing['2xl']
+        paddingHorizontal: spacing.lg,
+        paddingBottom: spacing.lg
     },
     fieldStack: {
         marginTop: spacing.lg,
-        gap: spacing.md
+        gap: spacing.lg
     },
     field: {
-        borderRadius: 16
+        borderRadius: radii.lg
     },
     aboutField: {
-        height: 140
+        height: 200,
+        paddingTop: spacing.lg
     },
     submitButton: {
-        marginTop: spacing['2xl']
+        marginTop: spacing.xl
     }
 });

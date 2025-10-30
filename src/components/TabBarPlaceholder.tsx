@@ -3,6 +3,7 @@ import { Feather } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing } from '@/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type TabKey = 'Home' | 'Explore' | 'Events' | 'Tickets' | 'Profile';
 
@@ -26,9 +27,10 @@ type Props = {
 
 export const TabBarPlaceholder = ({ activeTab, onTabSelect }: Props) => {
     const { palette } = useThemePalette();
+    const insets = useSafeAreaInsets();
 
     return (
-        <View style={[styles.container, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+        <View style={[styles.container, { backgroundColor: palette.surface, borderColor: palette.border, paddingBottom: insets.bottom }]}>
             {TAB_ITEMS.map(({ key, icon }) => {
                 const isActive = key === activeTab;
                 return (
@@ -67,15 +69,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
+        paddingTop: spacing.sm,
         borderTopWidth: 1
     },
     item: {
         alignItems: 'center',
-        gap: spacing.xs / 2
+        gap: spacing.xs / 2,
+        paddingVertical: spacing.xs,
+        flex: 1
     },
     label: {
-        fontFamily: 'Inter_500Medium'
+        fontFamily: 'Inter_500Medium',
+        fontSize: 11
     }
 });

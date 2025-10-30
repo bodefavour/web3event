@@ -12,6 +12,7 @@ import { OnboardingScreen } from '@/screens/OnboardingScreen';
 import { ConnectWalletScreen } from '@/screens/ConnectWalletScreen';
 import { ProfileSetupScreen } from '@/screens/ProfileSetupScreen';
 import { WelcomeScreen } from '@/screens/WelcomeScreen';
+import { HomeScreen } from '@/screens/HomeScreen';
 import { CreateEventScreen, CreateEventForm } from '@/screens/CreateEventScreen';
 import { TicketTypesScreen, TicketTypeForm } from '@/screens/TicketTypesScreen';
 import { DeployingScreen } from '@/screens/DeployingScreen';
@@ -23,6 +24,7 @@ import { BuyTicketsScreen } from '@/screens/BuyTicketsScreen';
 import { TransactionSuccessScreen } from '@/screens/TransactionSuccessScreen';
 import { TicketDetailScreen } from '@/screens/TicketDetailScreen';
 import type { TabKey } from '@/components/TabBarPlaceholder';
+import type { HostTabKey } from '@/components/HostTabBar';
 
 const EVENTS: EventDetail[] = [
     {
@@ -145,6 +147,7 @@ export default function App() {
         | 'connectWallet'
         | 'profileSetup'
         | 'welcome'
+        | 'home'
         | 'createEvent'
         | 'events'
         | 'ticketTypes'
@@ -157,6 +160,8 @@ export default function App() {
         | 'myTickets'
         | 'ticketDetail'
     >('onboarding');
+    const [isFirstTime, setIsFirstTime] = useState(true);
+    const [userRole, setUserRole] = useState<'host' | 'attendee'>('attendee');
     const [connectedWallet, setConnectedWallet] = useState<string | undefined>(undefined);
     const [eventDraft, setEventDraft] = useState<CreateEventForm | null>(null);
     const [ticketDraft, setTicketDraft] = useState<TicketTypeForm[] | null>(null);
@@ -196,24 +201,37 @@ export default function App() {
 
     const handleCompleteProfile = useCallback(() => {
         console.log('Profile completed');
+        setIsFirstTime(false);
         setRoute('welcome');
     }, []);
 
     const handleHostEvent = useCallback(() => {
         console.log('Host event selected');
+        setUserRole('host');
+        setIsFirstTime(false);
         setRoute('createEvent');
     }, []);
 
     const handleAttendEvent = useCallback(() => {
         console.log('Attend event selected');
+        setUserRole('attendee');
+        setIsFirstTime(false);
         setSelectedEvent(EVENTS[0]);
         setSelectedTicketTier(EVENTS[0].ticketTiers[0]);
-        setRoute('events');
+        setRoute('home');
+    }, []);
+
+    const handleSwitchRole = useCallback(() => {
+        setUserRole((prev) => (prev === 'host' ? 'attendee' : 'host'));
     }, []);
 
     const handleBackToWelcome = useCallback(() => {
-        setRoute('welcome');
-    }, []);
+        if (isFirstTime) {
+            setRoute('welcome');
+        } else {
+            setRoute('home');
+        }
+    }, [isFirstTime]);
 
     const handleBackToEvents = useCallback(() => {
         setRoute('events');
@@ -302,23 +320,26 @@ export default function App() {
     }, []);
 
     const handleTabSelect = useCallback(
-        (tab: TabKey) => {
-            switch (tab) {
-                case 'Home':
-                    setRoute('welcome');
-                    break;
-                case 'Explore':
-                case 'Events':
-                    setRoute('events');
-                    break;
-                case 'Tickets':
-                    setRoute('myTickets');
-                    break;
-                case 'Profile':
-                    console.log('Profile tab selected');
-                    break;
-                default:
-                    break;
+        (tab: TabKey | HostTabKey) => {
+            // Handle attendee tabs
+            if (tab === 'Home') {
+                setRoute('home');
+            } else if (tab === 'Events' || tab === 'Explore') {
+                setRoute('events');
+            } else if (tab === 'Tickets') {
+                setRoute('myTickets');
+            } else if (tab === 'Profile') {
+                console.log('Profile tab selected');
+            }
+            // Handle host tabs
+            else if (tab === 'Dashboard') {
+                setRoute('home');
+            } else if (tab === 'My Events') {
+                setRoute('events');
+            } else if (tab === 'Create Event') {
+                setRoute('createEvent');
+            } else if (tab === 'Analytics') {
+                console.log('Analytics tab selected');
             }
         },
         []
@@ -340,10 +361,34 @@ export default function App() {
         );
     }
 
+    if (route === 'home') {
+        return (
+            <HomeScreen
+                userRole={userRole}
+                onSwitchRole={handleSwitchRole}
+                onTabSelect={handleTabSelect}
+                onEventSelect={(eventId) => {
+                    const event = EVENTS.find((e) => e.id === eventId);
+                    if (event) {
+                        setSelectedEvent(event);
+                        setRoute('eventDetails');
+                    }
+                }}
+                onTicketSelect={(ticketId) => {
+                    const ticket = MY_TICKETS.find((t) => t.id === ticketId);
+                    if (ticket) {
+                        setSelectedTicket(ticket);
+                        setRoute('ticketDetail');
+                    }
+                }}
+            />
+        );
+    }
+
     if (route === 'ticketDetail') {
         const ticket = selectedTicket ?? MY_TICKETS[0];
         const eventForTicket = selectedEvent ?? EVENTS[0];
-        
+
         const ticketDetail = {
             id: ticket.id,
             eventTitle: ticket.title,
@@ -382,7 +427,7 @@ export default function App() {
 
     if (route === 'buyTickets') {
         const ticketTier = selectedTicketTier ?? selectedEvent?.ticketTiers[0];
-        
+
         return (
             <BuyTicketsScreen
                 ticketTier={ticketTier!}
@@ -495,6 +540,7 @@ export default function App() {
                 onSave={handleSaveTicketTypes}
                 initialTypes={ticketDraft ?? undefined}
                 onTabSelect={handleTabSelect}
+                userRole={userRole}
             />
         );
     }
@@ -505,11 +551,36 @@ export default function App() {
                 onBack={handleBackToWelcome}
                 onSubmit={handleCreateEvent}
                 onTabSelect={handleTabSelect}
+                userRole={userRole}
             />
         );
     }
 
     if (route === 'welcome') {
+        // Only show welcome screen for first-time users
+        if (!isFirstTime) {
+            return (
+                <HomeScreen
+                    userRole={userRole}
+                    onSwitchRole={handleSwitchRole}
+                    onTabSelect={handleTabSelect}
+                    onEventSelect={(eventId) => {
+                        const event = EVENTS.find((e) => e.id === eventId);
+                        if (event) {
+                            setSelectedEvent(event);
+                            setRoute('eventDetails');
+                        }
+                    }}
+                    onTicketSelect={(ticketId) => {
+                        const ticket = MY_TICKETS.find((t) => t.id === ticketId);
+                        if (ticket) {
+                            setSelectedTicket(ticket);
+                            setRoute('ticketDetail');
+                        }
+                    }}
+                />
+            );
+        }
         return (
             <WelcomeScreen
                 onHostEvent={handleHostEvent}
