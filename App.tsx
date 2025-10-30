@@ -24,6 +24,11 @@ import { MyTicketsScreen, TicketItem } from '@/screens/MyTicketsScreen';
 import { BuyTicketsScreen } from '@/screens/BuyTicketsScreen';
 import { TransactionSuccessScreen } from '@/screens/TransactionSuccessScreen';
 import { TicketDetailScreen } from '@/screens/TicketDetailScreen';
+import { HostDashboardScreen } from '@/screens/HostDashboardScreen';
+import { AnalyticsScreen } from '@/screens/AnalyticsScreen';
+import { NotificationsScreen } from '@/screens/NotificationsScreen';
+import { HelpSupportScreen } from '@/screens/HelpSupportScreen';
+import { WalletsScreen } from '@/screens/WalletsScreen';
 import type { TabKey } from '@/components/TabBarPlaceholder';
 import type { HostTabKey } from '@/components/HostTabBar';
 
@@ -149,6 +154,11 @@ function AppContent() {
         | 'profileSetup'
         | 'welcome'
         | 'home'
+        | 'hostDashboard'
+        | 'analytics'
+        | 'notifications'
+        | 'helpSupport'
+        | 'wallets'
         | 'createEvent'
         | 'events'
         | 'ticketTypes'
@@ -210,7 +220,7 @@ function AppContent() {
         console.log('Host event selected');
         setUserRole('host');
         setIsFirstTime(false);
-        setRoute('createEvent');
+        setRoute('hostDashboard');
     }, []);
 
     const handleAttendEvent = useCallback(() => {
@@ -230,9 +240,9 @@ function AppContent() {
         if (isFirstTime) {
             setRoute('welcome');
         } else {
-            setRoute('home');
+            setRoute(userRole === 'host' ? 'hostDashboard' : 'home');
         }
-    }, [isFirstTime]);
+    }, [isFirstTime, userRole]);
 
     const handleBackToEvents = useCallback(() => {
         setRoute('events');
@@ -334,13 +344,13 @@ function AppContent() {
             }
             // Handle host tabs
             else if (tab === 'Dashboard') {
-                setRoute('home');
+                setRoute('hostDashboard');
             } else if (tab === 'My Events') {
                 setRoute('events');
             } else if (tab === 'Create Event') {
                 setRoute('createEvent');
             } else if (tab === 'Analytics') {
-                console.log('Analytics tab selected');
+                setRoute('analytics');
             }
         },
         []
@@ -382,6 +392,65 @@ function AppContent() {
                         setRoute('ticketDetail');
                     }
                 }}
+            />
+        );
+    }
+
+    if (route === 'hostDashboard') {
+        return (
+            <HostDashboardScreen
+                onTabSelect={handleTabSelect}
+                onCreateEvent={() => setRoute('createEvent')}
+                onViewAnalytics={() => setRoute('analytics')}
+                onManageEvent={(eventId) => {
+                    console.log('Manage event:', eventId);
+                    setRoute('events');
+                }}
+            />
+        );
+    }
+
+    if (route === 'analytics') {
+        return (
+            <AnalyticsScreen
+                onBack={() => setRoute('hostDashboard')}
+                onTabSelect={handleTabSelect}
+            />
+        );
+    }
+
+    if (route === 'notifications') {
+        return (
+            <NotificationsScreen
+                onBack={() => setRoute(userRole === 'host' ? 'hostDashboard' : 'home')}
+                onTabSelect={handleTabSelect}
+                userRole={userRole}
+                onNotificationPress={(id) => console.log('Notification pressed:', id)}
+            />
+        );
+    }
+
+    if (route === 'helpSupport') {
+        return (
+            <HelpSupportScreen
+                onBack={() => setRoute(userRole === 'host' ? 'hostDashboard' : 'home')}
+                onTabSelect={handleTabSelect}
+                userRole={userRole}
+                onTopicPress={(id) => console.log('Topic pressed:', id)}
+                onChatSupport={() => console.log('Chat support')}
+                onEmailSupport={() => console.log('Email support')}
+            />
+        );
+    }
+
+    if (route === 'wallets') {
+        return (
+            <WalletsScreen
+                onBack={() => setRoute(userRole === 'host' ? 'hostDashboard' : 'home')}
+                onTabSelect={handleTabSelect}
+                userRole={userRole}
+                onWalletPress={(id) => console.log('Wallet pressed:', id)}
+                onSecurityPress={(id) => console.log('Security option pressed:', id)}
             />
         );
     }
