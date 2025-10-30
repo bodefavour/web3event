@@ -1,5 +1,6 @@
 import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
 import { useCallback, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
     useFonts,
     Inter_400Regular,
@@ -140,7 +141,7 @@ const MY_TICKETS: TicketItem[] = [
     }
 ];
 
-export default function App() {
+function AppContent() {
     const { palette } = useThemePalette();
     const [route, setRoute] = useState<
         | 'onboarding'
@@ -611,6 +612,14 @@ export default function App() {
             onConnectWallet={handleConnectWallet}
             onExploreEvents={handleExploreEvents}
         />
+    );
+}
+
+export default function App() {
+    return (
+        <SafeAreaProvider>
+            <AppContent />
+        </SafeAreaProvider>
     );
 }
 
