@@ -7,12 +7,10 @@ const router = Router();
 
 // Generate JWT token
 const generateToken = (userId: string): string => {
-    const secret = process.env.JWT_SECRET || 'fallback_secret_key';
-    const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
-    return jwt.sign({ userId }, secret, { expiresIn });
-};
-
-// @route   POST /api/auth/register
+  const secret = process.env.JWT_SECRET || 'fallback_secret_key';
+  const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
+  return jwt.sign({ userId }, secret, { expiresIn: expiresIn });
+};// @route   POST /api/auth/register
 // @desc    Register new user
 // @access  Public
 router.post(
