@@ -19,6 +19,9 @@ import { ReviewScreen } from '@/screens/ReviewScreen';
 import { EventsScreen } from '@/screens/EventsScreen';
 import { EventDetailsScreen, EventDetail, EventTicketTier } from '@/screens/EventDetailsScreen';
 import { MyTicketsScreen, TicketItem } from '@/screens/MyTicketsScreen';
+import { BuyTicketsScreen } from '@/screens/BuyTicketsScreen';
+import { TransactionSuccessScreen } from '@/screens/TransactionSuccessScreen';
+import { TicketDetailScreen } from '@/screens/TicketDetailScreen';
 import type { TabKey } from '@/components/TabBarPlaceholder';
 
 const EVENTS: EventDetail[] = [
@@ -147,15 +150,20 @@ export default function App() {
         | 'ticketTypes'
         | 'deploying'
         | 'review'
+        | 'buyTickets'
+        | 'transactionSuccess'
         | 'ticketReview'
         | 'eventDetails'
         | 'myTickets'
+        | 'ticketDetail'
     >('onboarding');
     const [connectedWallet, setConnectedWallet] = useState<string | undefined>(undefined);
     const [eventDraft, setEventDraft] = useState<CreateEventForm | null>(null);
     const [ticketDraft, setTicketDraft] = useState<TicketTypeForm[] | null>(null);
     const [selectedEvent, setSelectedEvent] = useState<EventDetail | null>(EVENTS[0]);
     const [selectedTicketTier, setSelectedTicketTier] = useState<EventTicketTier | null>(EVENTS[0].ticketTiers[0]);
+    const [selectedTicket, setSelectedTicket] = useState<TicketItem | null>(null);
+    const [purchaseQuantity, setPurchaseQuantity] = useState(1);
     const [fontsLoaded] = useFonts({
         Inter_400Regular,
         Inter_500Medium,
@@ -253,10 +261,23 @@ export default function App() {
                 setSelectedTicketTier(resolvedTier);
             }
             console.log('Buy tickets tapped', resolvedTier);
-            setRoute('ticketReview');
+            setRoute('buyTickets');
         },
         [selectedEvent]
     );
+
+    const handleBuyTicketsClose = useCallback(() => {
+        setRoute('eventDetails');
+    }, []);
+
+    const handleBuyTicketsWallet = useCallback(() => {
+        console.log('Wallet connected for purchase');
+        setRoute('transactionSuccess');
+    }, []);
+
+    const handleTransactionSuccess = useCallback(() => {
+        setRoute('myTickets');
+    }, []);
 
     const handleTicketReviewBack = useCallback(() => {
         setRoute('eventDetails');
@@ -272,6 +293,12 @@ export default function App() {
 
     const handleViewTicket = useCallback((ticket: TicketItem) => {
         console.log('View ticket tapped:', ticket);
+        setSelectedTicket(ticket);
+        setRoute('ticketDetail');
+    }, []);
+
+    const handleTicketDetailBack = useCallback(() => {
+        setRoute('myTickets');
     }, []);
 
     const handleTabSelect = useCallback(
@@ -310,6 +337,60 @@ export default function App() {
             <SafeAreaView style={[styles.loadingContainer, { backgroundColor: palette.background }]}>
                 <ActivityIndicator size="small" color={palette.primary} />
             </SafeAreaView>
+        );
+    }
+
+    if (route === 'ticketDetail') {
+        const ticket = selectedTicket ?? MY_TICKETS[0];
+        const eventForTicket = selectedEvent ?? EVENTS[0];
+        
+        const ticketDetail = {
+            id: ticket.id,
+            eventTitle: ticket.title,
+            eventImage: ticket.thumbnail,
+            eventDate: ticket.date,
+            eventTime: eventForTicket.time,
+            eventLocation: ticket.location,
+            ticketType: ticket.typeLabel,
+            ticketNumber: `#${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`,
+            purchaseDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            price: selectedTicketTier?.price ?? '$50',
+            transferable: true,
+            organizerName: eventForTicket.organizerCompany,
+            eventDescription: eventForTicket.description
+        };
+
+        return (
+            <TicketDetailScreen
+                ticket={ticketDetail}
+                onBack={handleTicketDetailBack}
+                onTabSelect={handleTabSelect}
+            />
+        );
+    }
+
+    if (route === 'transactionSuccess') {
+        return (
+            <TransactionSuccessScreen
+                onViewTicket={handleTransactionSuccess}
+                onTabSelect={handleTabSelect}
+                ticketQuantity={purchaseQuantity}
+                eventTitle={selectedEvent?.title}
+            />
+        );
+    }
+
+    if (route === 'buyTickets') {
+        const ticketTier = selectedTicketTier ?? selectedEvent?.ticketTiers[0];
+        
+        return (
+            <BuyTicketsScreen
+                ticketTier={ticketTier!}
+                eventTitle={selectedEvent?.title}
+                onClose={handleBuyTicketsClose}
+                onConnectWallet={handleBuyTicketsWallet}
+                onTabSelect={handleTabSelect}
+            />
         );
     }
 
