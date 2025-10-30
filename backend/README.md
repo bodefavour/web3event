@@ -1,16 +1,16 @@
-# Web3 Event Backend
+# Web3 Event Backend - Hedera Hashgraph Edition
 
-Backend API for the Web3 Event Management Platform built with Node.js, Express, MongoDB, and Ethers.js.
+Backend API for the Web3 Event Management Platform built with Node.js, Express, MongoDB, and **Hedera Hashgraph SDK**.
 
 ## Features
 
 - 🔐 JWT Authentication
 - 📊 Event Management (CRUD)
-- 🎫 NFT Ticket System
-- 💳 Transaction Tracking
+- 🎫 NFT Ticket System (Hedera Token Service)
+- 💳 Transaction Tracking on Hedera
 - 📈 Analytics Dashboard
 - 🔔 Real-time Notifications
-- 🌐 Web3 Integration (Ethereum/Sepolia)
+- 🌐 Hedera Hashgraph Integration
 - 🔒 Security Best Practices
 
 ## Tech Stack
@@ -18,10 +18,22 @@ Backend API for the Web3 Event Management Platform built with Node.js, Express, 
 - **Runtime:** Node.js + TypeScript
 - **Framework:** Express.js
 - **Database:** MongoDB + Mongoose
-- **Blockchain:** Ethers.js (Sepolia testnet)
+- **Blockchain:** Hedera Hashgraph (Testnet/Mainnet)
+- **Hedera SDK:** @hashgraph/sdk
 - **Authentication:** JWT + bcrypt
 - **Validation:** express-validator
 - **Security:** helmet, cors, rate-limiting
+
+## Why Hedera?
+
+This project uses **Hedera Hashgraph** instead of traditional blockchains for several key advantages:
+
+- ⚡ **Fast**: 3-5 second transaction finality
+- 💰 **Low Cost**: Predictable, low fees (~$0.0001 per transaction)
+- 🌱 **Carbon Negative**: Most sustainable DLT platform
+- 🔒 **Secure**: aBFT consensus algorithm
+- 📊 **Scalable**: 10,000+ TPS
+- 🎫 **Native NFT Support**: Hedera Token Service (HTS) for NFT tickets
 
 ## Getting Started
 
@@ -29,8 +41,8 @@ Backend API for the Web3 Event Management Platform built with Node.js, Express, 
 
 - Node.js (v18+)
 - MongoDB (local or MongoDB Atlas)
-- Ethereum wallet with Sepolia testnet ETH
-- Infura project ID (for blockchain connection)
+- **Hedera testnet account** ([Create one here](https://portal.hedera.com))
+- Hedera Account ID and Private Key
 
 ### Installation
 
@@ -51,11 +63,21 @@ NODE_ENV=development
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/web3event
 JWT_SECRET=your_super_secret_jwt_key
-INFURA_PROJECT_ID=your_infura_project_id
-PRIVATE_KEY=your_wallet_private_key
+
+# Hedera Configuration
+HEDERA_NETWORK=testnet
+HEDERA_ACCOUNT_ID=0.0.xxxxx
+HEDERA_PRIVATE_KEY=302e020100300506032b657004220420...
+HEDERA_OPERATOR_KEY=302e020100300506032b657004220420...
 ```
 
-4. Start development server:
+4. Get Hedera testnet credentials:
+   - Visit [Hedera Portal](https://portal.hedera.com)
+   - Create a testnet account
+   - Get free test HBAR from the faucet
+   - Copy your Account ID and Private Key to `.env`
+
+5. Start development server:
 ```bash
 npm run dev
 ```
@@ -141,23 +163,77 @@ The server will start on `http://localhost:5000`
 - Read status
 - Associated data (event/ticket/transaction IDs)
 
-## Web3 Integration
+## Hedera Integration
 
-The backend integrates with Ethereum blockchain (Sepolia testnet) for:
+The backend integrates with **Hedera Hashgraph** for:
 
-- **NFT Ticket Minting:** Each ticket is an NFT
-- **Smart Contract Interaction:** Event creation and management
-- **Transaction Verification:** Blockchain transaction validation
-- **Wallet Management:** Connect and manage user wallets
+- **NFT Ticket Minting**: Using Hedera Token Service (HTS)
+- **Smart Contract Execution**: Event creation and management
+- **Transaction Verification**: Fast, low-cost transactions
+- **Account Management**: Hedera account integration
 
-### Smart Contracts (Required)
+### Hedera Token Service (HTS) vs Smart Contracts
 
-Deploy these contracts to Sepolia testnet:
+This project uses **Hedera Token Service** for NFT tickets, which provides:
 
-1. **TicketNFT Contract:** ERC-721 for ticket NFTs
-2. **EventFactory Contract:** Create and manage events
+✅ **Native Token Support**: No smart contract needed
+✅ **Lower Costs**: ~$0.0001 per mint vs $0.001+ with contracts
+✅ **Better Performance**: Built into Hedera consensus
+✅ **Automatic Royalties**: Native royalty support
+✅ **Easier Integration**: Simple SDK methods
 
-Update contract addresses in `.env` file.
+### Available Hedera Methods
+
+See `src/utils/web3.ts` for the `HederaService` class:
+
+```typescript
+// Create NFT token for tickets
+await hederaService.createTicketNFT(tokenName, symbol, treasuryId);
+
+// Mint ticket NFTs
+await hederaService.mintTicket(tokenId, [metadataURI]);
+
+// Transfer ticket to buyer
+await hederaService.transferTicket(tokenId, fromId, toId, serialNumber);
+
+// Get account balance
+await hederaService.getAccountBalance(accountId);
+
+// Execute smart contract
+await hederaService.executeContract(contractId, functionName, params);
+```
+
+### Smart Contract Deployment (Optional)
+
+If you prefer using smart contracts instead of HTS:
+
+1. Compile Solidity contracts:
+```bash
+# Install Solidity compiler
+npm install -g solc
+
+# Compile contracts
+solcjs --bin --abi contracts/EventFactory.sol -o contracts/compiled
+solcjs --bin --abi contracts/TicketNFT.sol -o contracts/compiled
+```
+
+2. Deploy to Hedera:
+```bash
+npm run deploy
+```
+
+3. Update contract IDs in `.env`:
+```env
+TICKET_NFT_CONTRACT_ID=0.0.xxxxx
+EVENT_FACTORY_CONTRACT_ID=0.0.xxxxx
+```
+
+### Hedera Network Explorer
+
+- **Testnet**: https://hashscan.io/testnet
+- **Mainnet**: https://hashscan.io/mainnet
+
+View all transactions, tokens, and contracts on HashScan.
 
 ## Scripts
 
