@@ -16,6 +16,7 @@ config.resolver.extraNodeModules = {
     util: require.resolve('util'),
     events: require.resolve('events'),
     path: require.resolve('path-browserify'),
+    zlib: require.resolve('browserify-zlib'),
     fs: false,
     net: false,
     tls: false,
