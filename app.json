@@ -1,24 +1,40 @@
 {
-    "expo": {
-        "name": "web3event",
-        "slug": "web3event",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "userInterfaceStyle": "automatic",
-        "splash": {
-            "resizeMode": "contain",
-            "backgroundColor": "#FFFFFF"
-        },
-        "assetBundlePatterns": [
-            "**/*"
-        ],
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "adaptiveIcon": {
-                "backgroundColor": "#FFFFFF"
-            }
-        }
+  "expo": {
+    "name": "web3event",
+    "slug": "web3event",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "y",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.bodefavour.web3event",
+      "permissions": [
+        "CAMERA",
+        "INTERNET",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "41d38f2d-ddcc-42a7-abae-bfd74475dcf4"
+      }
     }
+  }
 }

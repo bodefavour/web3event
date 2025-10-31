@@ -1,7 +1,7 @@
 import { StyleSheet, View, Pressable, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { useThemePalette } from '@/hooks/useThemePalette';
@@ -9,6 +9,8 @@ import { spacing } from '@/theme';
 import { Feather } from '@expo/vector-icons';
 import apiService from '@/services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { hederaWalletService } from '@/services/hederaWallet';
+import { ConnectWallet, useAddress, useDisconnect } from '@thirdweb-dev/react-native';
 
 // Wallet configurations with actual logos
 const walletOptions = [
@@ -68,7 +70,6 @@ export const ConnectWalletScreen = ({ onBack, onSelectWallet }: Props) => {
 
     const address = useAddress();
     const disconnect = useDisconnect();
-    const sdk = useSDK();
 
     const handleWalletConnect = async (walletId: string, walletType: string) => {
         if (walletType === 'hedera') {
@@ -96,30 +97,55 @@ export const ConnectWalletScreen = ({ onBack, onSelectWallet }: Props) => {
 
     const handleHederaWalletConnect = async (walletId: string) => {
         try {
-            // For Hedera wallets, prompt user to enter their account ID
+            // For Hedera wallets, we can use WalletConnect or manual input
+            // For now, using manual input for HashPack/Blade
             if (walletId === 'hashpack' || walletId === 'blade') {
-                Alert.prompt(
-                    `Connect ${walletId === 'hashpack' ? 'HashPack' : 'Blade'} Wallet`,
-                    'Enter your Hedera account ID (e.g., 0.0.12345)',
-                    [
-                        {
-                            text: 'Cancel',
-                            style: 'cancel'
-                        },
-                        {
-                            text: 'Connect',
-                            onPress: async (accountId?: string) => {
-                                if (accountId && accountId.match(/^0\.0\.\d+$/)) {
-                                    await handleWalletConnected(accountId, walletId);
-                                } else {
-                                    Alert.alert('Invalid Format', 'Please enter a valid Hedera account ID (e.g., 0.0.12345)');
+                // Attempt to open wallet app
+                try {
+                    if (walletId === 'hashpack') {
+                        await hederaWalletService.connectHashPack();
+                    } else {
+                        await hederaWalletService.connectBlade();
+                    }
+                } catch (error: any) {
+                    // If deep linking fails, fall back to manual entry
+                    if (error.message === 'PROMPT_NEEDED') {
+                        // Show prompt for account ID
+                        Alert.prompt(
+                            `Connect ${walletId === 'hashpack' ? 'HashPack' : 'Blade'} Wallet`,
+                            `Enter your Hedera account ID from ${walletId === 'hashpack' ? 'HashPack' : 'Blade'} wallet\n\nExample: 0.0.12345`,
+                            [
+                                {
+                                    text: 'Cancel',
+                                    style: 'cancel'
+                                },
+                                {
+                                    text: 'Connect',
+                                    onPress: async (accountId?: string) => {
+                                        if (accountId && hederaWalletService.validateAccountId(accountId)) {
+                                            // Save connection
+                                            await hederaWalletService.saveConnection(
+                                                accountId,
+                                                walletId as 'hashpack' | 'blade'
+                                            );
+                                            // Connect wallet
+                                            await handleWalletConnected(accountId, walletId);
+                                        } else {
+                                            Alert.alert(
+                                                'Invalid Format',
+                                                'Please enter a valid Hedera account ID in format: 0.0.12345'
+                                            );
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    ],
-                    'plain-text',
-                    '0.0.'
-                );
+                            ],
+                            'plain-text',
+                            '0.0.'
+                        );
+                    } else {
+                        throw error;
+                    }
+                }
             }
 
         } catch (error: any) {

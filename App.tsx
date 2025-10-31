@@ -6,6 +6,11 @@ global.Buffer = Buffer;
 global.process = require('process');
 global.process.env = global.process.env || {};
 
+// Initialize Coinbase Wallet SDK
+import { initializeCoinbaseWalletSDK } from '@coinbase/wallet-mobile-sdk';
+
+initializeCoinbaseWalletSDK();
+
 import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
 import { useCallback, useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
