@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { body, validationResult } from 'express-validator';
-import User from '../models/User';
+import { prisma } from '../utils/prisma';
 
 const router = Router();
 
@@ -35,7 +36,9 @@ router.post(
             const { email, password, name, role } = req.body;
 
             // Check if user exists
-            const existingUser = await User.findOne({ email });
+            const existingUser = await prisma.user.findUnique({
+                where: { email }
+            });
             if (existingUser) {
                 return res.status(400).json({
                     success: false,
@@ -43,16 +46,21 @@ router.post(
                 });
             }
 
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
             // Create user
-            const user = await User.create({
-                email,
-                password,
-                name,
-                role: role || 'attendee',
+            const user = await prisma.user.create({
+                data: {
+                    email,
+                    password: hashedPassword,
+                    name,
+                    role: (role?.toUpperCase() as 'HOST' | 'ATTENDEE') || 'ATTENDEE',
+                }
             });
 
             // Generate token
-            const token = generateToken(String(user._id));
+            const token = generateToken(user.id);
 
             return res.status(201).json({
                 success: true,
@@ -60,7 +68,7 @@ router.post(
                 data: {
                     token,
                     user: {
-                        id: user._id,
+                        id: user.id,
                         email: user.email,
                         name: user.name,
                         role: user.role,
@@ -100,8 +108,10 @@ router.post(
             const { email, password } = req.body;
 
             // Find user
-            const user = await User.findOne({ email });
-            if (!user) {
+            const user = await prisma.user.findUnique({
+                where: { email }
+            });
+            if (!user || !user.password) {
                 return res.status(401).json({
                     success: false,
                     message: 'Invalid credentials',
@@ -109,7 +119,7 @@ router.post(
             }
 
             // Check password
-            const isMatch = await user.comparePassword(password);
+            const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
                 return res.status(401).json({
                     success: false,
@@ -118,7 +128,7 @@ router.post(
             }
 
             // Generate token
-            const token = generateToken(String(user._id));
+            const token = generateToken(user.id);
 
             return res.json({
                 success: true,
@@ -126,7 +136,7 @@ router.post(
                 data: {
                     token,
                     user: {
-                        id: user._id,
+                        id: user.id,
                         email: user.email,
                         name: user.name,
                         role: user.role,
@@ -164,8 +174,10 @@ router.post(
             const { walletAddress, userId } = req.body;
 
             // Check if wallet already connected to another user
-            const existingWallet = await User.findOne({ walletAddress });
-            if (existingWallet && String(existingWallet._id) !== userId) {
+            const existingWallet = await prisma.user.findUnique({
+                where: { walletAddress }
+            });
+            if (existingWallet && existingWallet.id !== userId) {
                 return res.status(400).json({
                     success: false,
                     message: 'This wallet is already connected to another account',
@@ -173,11 +185,19 @@ router.post(
             }
 
             // Update user with wallet address
-            const user = await User.findByIdAndUpdate(
-                userId,
-                { walletAddress },
-                { new: true }
-            ).select('-password');
+            const user = await prisma.user.update({
+                where: { id: userId },
+                data: { walletAddress },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    role: true,
+                    walletAddress: true,
+                    bio: true,
+                    profileImage: true,
+                }
+            });
 
             return res.json({
                 success: true,

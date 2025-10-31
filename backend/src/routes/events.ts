@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { body, query, validationResult } from 'express-validator';
-import Event from '../models/Event';
+import { body, validationResult } from 'express-validator';
+import { prisma } from '../utils/prisma';
 
 const router = Router();
 
@@ -20,37 +20,49 @@ router.get('/', async (req: Request, res: Response) => {
             limit = 10,
         } = req.query;
 
-        // Build query
-        const query: any = {};
+        // Build where clause
+        const where: any = {};
 
-        if (category) query.category = category;
-        if (city) query['location.city'] = new RegExp(city as string, 'i');
-        if (status) query.status = status;
+        if (category) where.category = category as string;
+        if (city) where.city = { contains: city as string, mode: 'insensitive' };
+        if (status) where.status = status as string;
         if (search) {
-            query.$or = [
-                { title: new RegExp(search as string, 'i') },
-                { description: new RegExp(search as string, 'i') },
+            where.OR = [
+                { title: { contains: search as string, mode: 'insensitive' } },
+                { description: { contains: search as string, mode: 'insensitive' } },
             ];
         }
 
         // Date range filter
         if (startDate || endDate) {
-            query.startDate = {};
-            if (startDate) query.startDate.$gte = new Date(startDate as string);
-            if (endDate) query.startDate.$lte = new Date(endDate as string);
+            where.startDate = {};
+            if (startDate) where.startDate.gte = new Date(startDate as string);
+            if (endDate) where.startDate.lte = new Date(endDate as string);
         }
 
         const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
 
-        const events = await Event.find(query)
-            .populate('host', 'name email profileImage')
-            .sort({ startDate: 1 })
-            .skip(skip)
-            .limit(parseInt(limit as string));
+        const events = await prisma.event.findMany({
+            where,
+            include: {
+                host: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        profileImage: true,
+                    }
+                },
+                ticketTypes: true,
+            },
+            orderBy: { startDate: 'asc' },
+            skip,
+            take: parseInt(limit as string),
+        });
 
-        const total = await Event.countDocuments(query);
+        const total = await prisma.event.count({ where });
 
-        res.json({
+        return res.json({
             success: true,
             data: {
                 events,
@@ -63,7 +75,7 @@ router.get('/', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Get events error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error fetching events',
             error: error.message,
@@ -76,8 +88,21 @@ router.get('/', async (req: Request, res: Response) => {
 // @access  Public
 router.get('/:id', async (req: Request, res: Response) => {
     try {
-        const event = await Event.findById(req.params.id)
-            .populate('host', 'name email profileImage bio');
+        const event = await prisma.event.findUnique({
+            where: { id: req.params.id },
+            include: {
+                host: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        profileImage: true,
+                        bio: true,
+                    }
+                },
+                ticketTypes: true,
+            }
+        });
 
         if (!event) {
             return res.status(404).json({
@@ -87,16 +112,18 @@ router.get('/:id', async (req: Request, res: Response) => {
         }
 
         // Increment view count
-        event.analytics.views += 1;
-        await event.save();
+        await prisma.event.update({
+            where: { id: req.params.id },
+            data: { views: { increment: 1 } }
+        });
 
-        res.json({
+        return res.json({
             success: true,
             data: { event },
         });
     } catch (error: any) {
         console.error('Get event error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error fetching event',
             error: error.message,
@@ -114,9 +141,9 @@ router.post(
         body('description').trim().notEmpty(),
         body('category').notEmpty(),
         body('venue').trim().notEmpty(),
-        body('location.address').notEmpty(),
-        body('location.city').notEmpty(),
-        body('location.country').notEmpty(),
+        body('address').notEmpty(),
+        body('city').notEmpty(),
+        body('country').notEmpty(),
         body('startDate').isISO8601(),
         body('endDate').isISO8601(),
         body('ticketTypes').isArray({ min: 1 }),
@@ -131,19 +158,71 @@ router.post(
                 });
             }
 
-            const eventData = req.body;
+            const { 
+                hostId,
+                title, 
+                description, 
+                category, 
+                venue, 
+                address, 
+                city, 
+                country,
+                latitude,
+                longitude,
+                startDate, 
+                endDate, 
+                image,
+                ticketTypes,
+                status
+            } = req.body;
 
-            // Create event
-            const event = await Event.create(eventData);
+            // Create event with ticket types
+            const event = await prisma.event.create({
+                data: {
+                    hostId,
+                    title,
+                    description,
+                    category,
+                    venue,
+                    address,
+                    city,
+                    country,
+                    latitude: latitude || 0,
+                    longitude: longitude || 0,
+                    startDate: new Date(startDate),
+                    endDate: new Date(endDate),
+                    image: image || null,
+                    status: status || 'DRAFT',
+                    ticketTypes: {
+                        create: ticketTypes.map((tt: any) => ({
+                            name: tt.name,
+                            price: tt.price,
+                            quantity: tt.quantity,
+                            sold: 0,
+                            benefits: tt.benefits || [],
+                        }))
+                    }
+                },
+                include: {
+                    ticketTypes: true,
+                    host: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                        }
+                    }
+                }
+            });
 
-            res.status(201).json({
+            return res.status(201).json({
                 success: true,
                 message: 'Event created successfully',
                 data: { event },
             });
         } catch (error: any) {
             console.error('Create event error:', error);
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 message: 'Error creating event',
                 error: error.message,
@@ -157,7 +236,9 @@ router.post(
 // @access  Private (host only)
 router.put('/:id', async (req: Request, res: Response) => {
     try {
-        const event = await Event.findById(req.params.id);
+        const event = await prisma.event.findUnique({
+            where: { id: req.params.id }
+        });
 
         if (!event) {
             return res.status(404).json({
@@ -166,21 +247,32 @@ router.put('/:id', async (req: Request, res: Response) => {
             });
         }
 
-        // Update event
-        const updatedEvent = await Event.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
+        const { ticketTypes, ...updateData } = req.body;
 
-        res.json({
+        // Update event
+        const updatedEvent = await prisma.event.update({
+            where: { id: req.params.id },
+            data: updateData,
+            include: {
+                ticketTypes: true,
+                host: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    }
+                }
+            }
+        });
+
+        return res.json({
             success: true,
             message: 'Event updated successfully',
             data: { event: updatedEvent },
         });
     } catch (error: any) {
         console.error('Update event error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error updating event',
             error: error.message,
@@ -193,7 +285,9 @@ router.put('/:id', async (req: Request, res: Response) => {
 // @access  Private (host only)
 router.delete('/:id', async (req: Request, res: Response) => {
     try {
-        const event = await Event.findById(req.params.id);
+        const event = await prisma.event.findUnique({
+            where: { id: req.params.id }
+        });
 
         if (!event) {
             return res.status(404).json({
@@ -202,15 +296,17 @@ router.delete('/:id', async (req: Request, res: Response) => {
             });
         }
 
-        await Event.findByIdAndDelete(req.params.id);
+        await prisma.event.delete({
+            where: { id: req.params.id }
+        });
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Event deleted successfully',
         });
     } catch (error: any) {
         console.error('Delete event error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error deleting event',
             error: error.message,
@@ -223,16 +319,21 @@ router.delete('/:id', async (req: Request, res: Response) => {
 // @access  Public
 router.get('/host/:hostId', async (req: Request, res: Response) => {
     try {
-        const events = await Event.find({ host: req.params.hostId })
-            .sort({ startDate: -1 });
+        const events = await prisma.event.findMany({
+            where: { hostId: req.params.hostId },
+            include: {
+                ticketTypes: true,
+            },
+            orderBy: { startDate: 'desc' }
+        });
 
-        res.json({
+        return res.json({
             success: true,
             data: { events },
         });
     } catch (error: any) {
         console.error('Get host events error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error fetching host events',
             error: error.message,

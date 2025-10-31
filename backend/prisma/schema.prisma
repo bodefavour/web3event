@@ -1,0 +1,222 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  name          String
+  role          Role      @default(ATTENDEE)
+  walletAddress String?   @unique
+  profileImage  String?
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  hostedEvents  Event[]         @relation("EventHost")
+  tickets       Ticket[]
+  transactions  Transaction[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([walletAddress])
+}
+
+enum Role {
+  HOST
+  ATTENDEE
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  hostId      String
+  category    String
+  venue       String
+  
+  address     String
+  city        String
+  country     String
+  latitude    Float?
+  longitude   Float?
+  
+  startDate   DateTime
+  endDate     DateTime
+  image       String?
+  
+  totalTickets Int      @default(0)
+  soldTickets  Int      @default(0)
+  
+  status      EventStatus @default(DRAFT)
+  
+  network         String   @default("hedera-testnet")
+  contractAddress String?
+  deployedAt      DateTime?
+  
+  views      Int @default(0)
+  favorites  Int @default(0)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  host         User          @relation("EventHost", fields: [hostId], references: [id], onDelete: Cascade)
+  ticketTypes  TicketType[]
+  tickets      Ticket[]
+  transactions Transaction[]
+
+  @@index([hostId])
+  @@index([category])
+  @@index([city])
+  @@index([status])
+  @@index([startDate])
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model TicketType {
+  id          String  @id @default(cuid())
+  eventId     String
+  name        String
+  price       Float
+  quantity    Int
+  sold        Int     @default(0)
+  description String?
+  benefits    String[]
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+model Ticket {
+  id           String   @id @default(cuid())
+  eventId      String
+  ownerId      String
+  ticketType   String
+  price        Float
+  quantity     Int      @default(1)
+  qrCode       String   @unique
+  
+  tokenId      String?
+  tokenURI     String?
+  imageURI     String?
+  
+  status       TicketStatus @default(ACTIVE)
+  purchaseDate DateTime     @default(now())
+  usedDate     DateTime?
+  
+  transactionHash  String
+  contractAddress  String
+  serialNumber     String?
+  network          String   @default("hedera-testnet")
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([ownerId, status])
+  @@index([eventId, status])
+  @@index([qrCode])
+}
+
+enum TicketStatus {
+  ACTIVE
+  USED
+  TRANSFERRED
+  CANCELLED
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  eventId     String
+  ticketId    String?
+  
+  type        TransactionType
+  amount      Float
+  currency    String          @default("HBAR")
+  status      TransactionStatus @default(PENDING)
+  paymentMethod String        @default("crypto")
+  
+  transactionHash String  @unique
+  blockNumber     Int?
+  network         String  @default("hedera-testnet")
+  gasUsed         String?
+  gasPaid         String?
+  
+  walletAddress String?
+  fromAddress   String?
+  toAddress     String?
+  errorMessage  String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event  Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticket Ticket? @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([eventId])
+  @@index([transactionHash])
+}
+
+enum TransactionType {
+  PURCHASE
+  REFUND
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model Notification {
+  id      String           @id @default(cuid())
+  userId  String
+  type    NotificationType
+  title   String
+  message String           @db.Text
+  read    Boolean          @default(false)
+  
+  eventId       String?
+  ticketId      String?
+  transactionId String?
+  actionUrl     String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+}
+
+enum NotificationType {
+  EVENT
+  TICKET
+  TRANSACTION
+  SYSTEM
+}

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import Notification from '../models/Notification';
+import { prisma } from '../utils/prisma';
 
 const router = Router();
 
@@ -10,20 +10,24 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
     try {
         const { read, type } = req.query;
 
-        const query: any = { user: req.params.userId };
-        if (read !== undefined) query.read = read === 'true';
-        if (type) query.type = type;
+        const where: any = { userId: req.params.userId };
+        if (read !== undefined) where.read = read === 'true';
+        if (type) where.type = (type as string).toUpperCase();
 
-        const notifications = await Notification.find(query)
-            .sort({ createdAt: -1 })
-            .limit(50);
-
-        const unreadCount = await Notification.countDocuments({
-            user: req.params.userId,
-            read: false,
+        const notifications = await prisma.notification.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+            take: 50,
         });
 
-        res.json({
+        const unreadCount = await prisma.notification.count({
+            where: {
+                userId: req.params.userId,
+                read: false,
+            },
+        });
+
+        return res.json({
             success: true,
             data: {
                 notifications,
@@ -32,7 +36,7 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Get notifications error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error fetching notifications',
             error: error.message,
@@ -45,24 +49,29 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
 // @access  Private (system)
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const { userId, type, title, message, data } = req.body;
+        const { userId, type, title, message, eventId, ticketId, transactionId, actionUrl } = req.body;
 
-        const notification = await Notification.create({
-            user: userId,
-            type,
-            title,
-            message,
-            data,
+        const notification = await prisma.notification.create({
+            data: {
+                userId,
+                type,
+                title,
+                message,
+                eventId: eventId || null,
+                ticketId: ticketId || null,
+                transactionId: transactionId || null,
+                actionUrl: actionUrl || null,
+            },
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: 'Notification created',
             data: { notification },
         });
     } catch (error: any) {
         console.error('Create notification error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error creating notification',
             error: error.message,
@@ -75,11 +84,10 @@ router.post('/', async (req: Request, res: Response) => {
 // @access  Private
 router.put('/:id/read', async (req: Request, res: Response) => {
     try {
-        const notification = await Notification.findByIdAndUpdate(
-            req.params.id,
-            { read: true },
-            { new: true }
-        );
+        const notification = await prisma.notification.update({
+            where: { id: req.params.id },
+            data: { read: true },
+        });
 
         if (!notification) {
             return res.status(404).json({
@@ -88,14 +96,14 @@ router.put('/:id/read', async (req: Request, res: Response) => {
             });
         }
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Notification marked as read',
             data: { notification },
         });
     } catch (error: any) {
         console.error('Mark notification read error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error updating notification',
             error: error.message,
@@ -108,18 +116,21 @@ router.put('/:id/read', async (req: Request, res: Response) => {
 // @access  Private
 router.put('/user/:userId/read-all', async (req: Request, res: Response) => {
     try {
-        await Notification.updateMany(
-            { user: req.params.userId, read: false },
-            { read: true }
-        );
+        await prisma.notification.updateMany({
+            where: {
+                userId: req.params.userId,
+                read: false,
+            },
+            data: { read: true },
+        });
 
-        res.json({
+        return res.json({
             success: true,
             message: 'All notifications marked as read',
         });
     } catch (error: any) {
         console.error('Mark all read error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error updating notifications',
             error: error.message,
@@ -132,7 +143,9 @@ router.put('/user/:userId/read-all', async (req: Request, res: Response) => {
 // @access  Private
 router.delete('/:id', async (req: Request, res: Response) => {
     try {
-        const notification = await Notification.findByIdAndDelete(req.params.id);
+        const notification = await prisma.notification.delete({
+            where: { id: req.params.id },
+        });
 
         if (!notification) {
             return res.status(404).json({
@@ -141,13 +154,13 @@ router.delete('/:id', async (req: Request, res: Response) => {
             });
         }
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Notification deleted',
         });
     } catch (error: any) {
         console.error('Delete notification error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error deleting notification',
             error: error.message,

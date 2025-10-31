@@ -1,7 +1,5 @@
 import { Router, Request, Response } from 'express';
-import Event from '../models/Event';
-import Ticket from '../models/Ticket';
-import Transaction from '../models/Transaction';
+import { prisma } from '../utils/prisma';
 
 const router = Router();
 
@@ -12,8 +10,14 @@ router.get('/event/:eventId', async (req: Request, res: Response) => {
     try {
         const eventId = req.params.eventId;
 
-        // Get event
-        const event = await Event.findById(eventId);
+        // Get event with ticket types
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+            include: {
+                ticketTypes: true,
+            }
+        });
+
         if (!event) {
             return res.status(404).json({
                 success: false,
@@ -22,13 +26,17 @@ router.get('/event/:eventId', async (req: Request, res: Response) => {
         }
 
         // Get tickets
-        const tickets = await Ticket.find({ event: eventId });
+        const tickets = await prisma.ticket.findMany({
+            where: { eventId }
+        });
 
         // Get transactions
-        const transactions = await Transaction.find({
-            event: eventId,
-            status: 'completed',
-            type: 'purchase',
+        const transactions = await prisma.transaction.findMany({
+            where: {
+                eventId,
+                status: 'COMPLETED',
+                type: 'PURCHASE',
+            }
         });
 
         // Calculate revenue
@@ -47,28 +55,32 @@ router.get('/event/:eventId', async (req: Request, res: Response) => {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        const salesOverTime = await Transaction.aggregate([
-            {
-                $match: {
-                    event: event._id,
-                    status: 'completed',
-                    type: 'purchase',
-                    createdAt: { $gte: thirtyDaysAgo },
-                },
+        const recentTransactions = await prisma.transaction.findMany({
+            where: {
+                eventId,
+                status: 'COMPLETED',
+                type: 'PURCHASE',
+                createdAt: { gte: thirtyDaysAgo },
             },
-            {
-                $group: {
-                    _id: {
-                        $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
-                    },
-                    count: { $sum: 1 },
-                    revenue: { $sum: '$amount' },
-                },
-            },
-            {
-                $sort: { _id: 1 },
-            },
-        ]);
+            orderBy: { createdAt: 'asc' }
+        });
+
+        // Group by date
+        const salesByDate = new Map<string, { count: number; revenue: number }>();
+        recentTransactions.forEach(t => {
+            const dateKey = t.createdAt.toISOString().split('T')[0];
+            const existing = salesByDate.get(dateKey) || { count: 0, revenue: 0 };
+            salesByDate.set(dateKey, {
+                count: existing.count + 1,
+                revenue: existing.revenue + t.amount,
+            });
+        });
+
+        const salesOverTime = Array.from(salesByDate.entries()).map(([date, data]) => ({
+            _id: date,
+            count: data.count,
+            revenue: data.revenue,
+        }));
 
         // Demographics (placeholder - would need user data)
         const demographics = {
@@ -79,12 +91,12 @@ router.get('/event/:eventId', async (req: Request, res: Response) => {
                 { range: '45+', count: Math.floor(tickets.length * 0.15) },
             ],
             locations: [
-                { city: event.location.city, count: Math.floor(tickets.length * 0.6) },
+                { city: event.city, count: Math.floor(tickets.length * 0.6) },
                 { city: 'Other', count: Math.floor(tickets.length * 0.4) },
             ],
         };
 
-        res.json({
+        return res.json({
             success: true,
             data: {
                 overview: {
@@ -93,8 +105,8 @@ router.get('/event/:eventId', async (req: Request, res: Response) => {
                     availableTickets: event.totalTickets - event.soldTickets,
                     totalRevenue,
                     averageTicketPrice,
-                    views: event.analytics.views,
-                    favorites: event.analytics.favorites,
+                    views: event.views,
+                    favorites: event.favorites,
                 },
                 salesByType,
                 salesOverTime,
@@ -103,7 +115,7 @@ router.get('/event/:eventId', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Get event analytics error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error fetching analytics',
             error: error.message,
@@ -119,43 +131,59 @@ router.get('/host/:hostId', async (req: Request, res: Response) => {
         const hostId = req.params.hostId;
 
         // Get all host events
-        const events = await Event.find({ host: hostId });
-        const eventIds = events.map(e => e._id);
+        const events = await prisma.event.findMany({
+            where: { hostId },
+            include: {
+                ticketTypes: true,
+            }
+        });
+
+        const eventIds = events.map(e => e.id);
 
         // Get tickets for all events
-        const tickets = await Ticket.find({ event: { $in: eventIds } });
+        const tickets = await prisma.ticket.findMany({
+            where: { eventId: { in: eventIds } }
+        });
 
         // Get transactions
-        const transactions = await Transaction.find({
-            event: { $in: eventIds },
-            status: 'completed',
-            type: 'purchase',
+        const transactions = await prisma.transaction.findMany({
+            where: {
+                eventId: { in: eventIds },
+                status: 'COMPLETED',
+                type: 'PURCHASE',
+            }
         });
 
         // Calculate totals
         const totalRevenue = transactions.reduce((sum, t) => sum + t.amount, 0);
         const totalTicketsSold = tickets.length;
-        const totalViews = events.reduce((sum, e) => sum + e.analytics.views, 0);
+        const totalViews = events.reduce((sum, e) => sum + e.views, 0);
 
         // Events by status
+        const now = new Date();
         const eventsByStatus = {
-            upcoming: events.filter(e => e.status === 'published' && new Date(e.startDate) > new Date()).length,
-            ongoing: events.filter(e => e.status === 'ongoing').length,
-            completed: events.filter(e => e.status === 'completed').length,
-            draft: events.filter(e => e.status === 'draft').length,
+            upcoming: events.filter(e => e.status === 'PUBLISHED' && new Date(e.startDate) > now).length,
+            ongoing: events.filter(e => e.status === 'ONGOING').length,
+            completed: events.filter(e => e.status === 'COMPLETED').length,
+            draft: events.filter(e => e.status === 'DRAFT').length,
         };
 
         // Top performing events
-        const topEvents = events
-            .map(event => ({
-                id: event._id,
+        const eventsWithRevenue = events.map(event => {
+            const eventRevenue = transactions
+                .filter(t => t.eventId === event.id)
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            return {
+                id: event.id,
                 title: event.title,
                 soldTickets: event.soldTickets,
                 totalTickets: event.totalTickets,
-                revenue: transactions
-                    .filter(t => t.event.toString() === event._id.toString())
-                    .reduce((sum, t) => sum + t.amount, 0),
-            }))
+                revenue: eventRevenue,
+            };
+        });
+
+        const topEvents = eventsWithRevenue
             .sort((a, b) => b.revenue - a.revenue)
             .slice(0, 5);
 
@@ -163,30 +191,34 @@ router.get('/host/:hostId', async (req: Request, res: Response) => {
         const ninetyDaysAgo = new Date();
         ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-        const revenueOverTime = await Transaction.aggregate([
-            {
-                $match: {
-                    event: { $in: eventIds },
-                    status: 'completed',
-                    type: 'purchase',
-                    createdAt: { $gte: ninetyDaysAgo },
-                },
+        const recentTransactions = await prisma.transaction.findMany({
+            where: {
+                eventId: { in: eventIds },
+                status: 'COMPLETED',
+                type: 'PURCHASE',
+                createdAt: { gte: ninetyDaysAgo },
             },
-            {
-                $group: {
-                    _id: {
-                        $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
-                    },
-                    revenue: { $sum: '$amount' },
-                    count: { $sum: 1 },
-                },
-            },
-            {
-                $sort: { _id: 1 },
-            },
-        ]);
+            orderBy: { createdAt: 'asc' }
+        });
 
-        res.json({
+        // Group by date
+        const revenueByDate = new Map<string, { revenue: number; count: number }>();
+        recentTransactions.forEach(t => {
+            const dateKey = t.createdAt.toISOString().split('T')[0];
+            const existing = revenueByDate.get(dateKey) || { revenue: 0, count: 0 };
+            revenueByDate.set(dateKey, {
+                revenue: existing.revenue + t.amount,
+                count: existing.count + 1,
+            });
+        });
+
+        const revenueOverTime = Array.from(revenueByDate.entries()).map(([date, data]) => ({
+            _id: date,
+            revenue: data.revenue,
+            count: data.count,
+        }));
+
+        return res.json({
             success: true,
             data: {
                 overview: {
@@ -203,7 +235,7 @@ router.get('/host/:hostId', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Get host analytics error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error fetching host analytics',
             error: error.message,
@@ -214,36 +246,36 @@ router.get('/host/:hostId', async (req: Request, res: Response) => {
 // @route   GET /api/analytics/dashboard
 // @desc    Get general platform analytics
 // @access  Private (admin)
-router.get('/dashboard', async (req: Request, res: Response) => {
+router.get('/dashboard', async (_req: Request, res: Response) => {
     try {
-        const totalEvents = await Event.countDocuments();
-        const totalTickets = await Ticket.countDocuments();
-        const totalTransactions = await Transaction.countDocuments({ status: 'completed' });
+        const totalEvents = await prisma.event.count();
+        const totalTickets = await prisma.ticket.count();
+        const totalTransactions = await prisma.transaction.count({
+            where: { status: 'COMPLETED' }
+        });
 
-        const totalRevenue = await Transaction.aggregate([
-            {
-                $match: { status: 'completed', type: 'purchase' },
+        const revenueData = await prisma.transaction.aggregate({
+            where: {
+                status: 'COMPLETED',
+                type: 'PURCHASE',
             },
-            {
-                $group: {
-                    _id: null,
-                    total: { $sum: '$amount' },
-                },
-            },
-        ]);
+            _sum: {
+                amount: true,
+            }
+        });
 
-        res.json({
+        return res.json({
             success: true,
             data: {
                 totalEvents,
                 totalTickets,
                 totalTransactions,
-                totalRevenue: totalRevenue[0]?.total || 0,
+                totalRevenue: revenueData._sum.amount || 0,
             },
         });
     } catch (error: any) {
         console.error('Get dashboard analytics error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: 'Error fetching dashboard analytics',
             error: error.message,
