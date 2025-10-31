@@ -29,13 +29,6 @@ const walletOptions = [
         type: 'evm'
     },
     {
-        id: 'coinbase',
-        label: 'Coinbase Wallet',
-        accentColor: '#0052FF',
-        logo: 'https://www.coinbase.com/img/favicon/favicon-32x32.png',
-        type: 'evm'
-    },
-    {
         id: 'trust',
         label: 'Trust Wallet',
         accentColor: '#3375BB',
