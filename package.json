@@ -14,7 +14,6 @@
     "dev:all": "concurrently -n \"backend,frontend\" -c \"blue,magenta\" \"cd backend && npm run dev\" \"expo start\""
   },
   "dependencies": {
-    "@coinbase/wallet-mobile-sdk": "^1.1.2",
     "@expo-google-fonts/inter": "^0.1.0",
     "@hashgraph/hedera-wallet-connect": "^2.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -45,7 +44,6 @@
     "react-native": "0.81.5",
     "react-native-chart-kit": "^6.12.0",
     "react-native-get-random-values": "~1.11.0",
-    "react-native-mmkv": "^4.0.0",
     "react-native-qrcode-svg": "^6.3.16",
     "react-native-safe-area-context": "^5.6.2",
     "react-native-svg": "15.12.1",
@@ -58,11 +56,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
-    "@types/react": "~18.2.37",
     "babel-plugin-module-resolver": "^5.0.2",
     "concurrently": "^9.2.1",
     "node-libs-expo": "^0.0.3",
-    "react-native-get-random-values": "^2.0.0",
     "typescript": "~5.9.2"
   }
 }
