@@ -701,7 +701,7 @@ function AppContent() {
 
 export default function App() {
     const clientId = process.env.EXPO_PUBLIC_THIRDWEB_CLIENT_ID;
-    
+
     return (
         <ThirdwebProvider
             activeChain="ethereum"
