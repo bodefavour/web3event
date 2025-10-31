@@ -1,26 +1,26 @@
 import {
-  Client,
-  PrivateKey,
-  AccountId,
-  ContractExecuteTransaction,
-  ContractCallQuery,
-  ContractFunctionParameters,
-  TokenCreateTransaction,
-  TokenType,
-  TokenSupplyType,
-  TokenMintTransaction,
-  TokenAssociateTransaction,
-  TransferTransaction,
-  AccountBalanceQuery,
+    Client,
+    PrivateKey,
+    AccountId,
+    ContractExecuteTransaction,
+    ContractCallQuery,
+    ContractFunctionParameters,
+    TokenCreateTransaction,
+    TokenType,
+    TokenSupplyType,
+    TokenMintTransaction,
+    TokenAssociateTransaction,
+    TransferTransaction,
+    AccountBalanceQuery,
 } from '@hashgraph/sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 export class HederaService {
-  private client!: Client;
-  private operatorId!: AccountId;
-  private operatorKey!: PrivateKey;    constructor() {
+    private client!: Client;
+    private operatorId!: AccountId;
+    private operatorKey!: PrivateKey; constructor() {
         this.initializeClient();
     }
 

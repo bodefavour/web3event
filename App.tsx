@@ -1,6 +1,7 @@
 import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import apiService from '@/services/api';
 import {
     useFonts,
     Inter_400Regular,
@@ -147,7 +148,12 @@ const MY_TICKETS: TicketItem[] = [
 ];
 
 function AppContent() {
-    const { palette } = useThemePalette();
+    const palette = useThemePalette();
+    
+    // Initialize API service on mount
+    useEffect(() => {
+        apiService.initialize();
+    }, []);
     const [route, setRoute] = useState<
         | 'onboarding'
         | 'connectWallet'
@@ -366,8 +372,8 @@ function AppContent() {
 
     if (!fontsLoaded) {
         return (
-            <SafeAreaView style={[styles.loadingContainer, { backgroundColor: palette.background }]}>
-                <ActivityIndicator size="small" color={palette.primary} />
+            <SafeAreaView style={[styles.loadingContainer, { backgroundColor: palette.palette.background }]}>
+                <ActivityIndicator size="small" color={palette.palette.primary} />
             </SafeAreaView>
         );
     }
