@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
 import { useCallback, useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -11,7 +12,7 @@ import {
 } from '@expo-google-fonts/inter';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { OnboardingScreen } from '@/screens/OnboardingScreen';
-import { ConnectWalletScreen } from '@/screens/ConnectWalletScreen';
+import { ConnectWalletScreen } from '@/screens/ConnectWalletScreenNew';
 import { ProfileSetupScreen } from '@/screens/ProfileSetupScreen';
 import { WelcomeScreen } from '@/screens/WelcomeScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
@@ -210,9 +211,9 @@ function AppContent() {
         setRoute('connectWallet');
     }, []);
 
-    const handleSelectWallet = useCallback((wallet: string) => {
-        console.log('Wallet selected:', wallet);
-        setConnectedWallet('0x123...456P');
+    const handleSelectWallet = useCallback((walletAddress: string, walletType: string) => {
+        console.log('Wallet connected:', walletAddress, walletType);
+        setConnectedWallet(walletAddress);
         setRoute('profileSetup');
     }, []);
 

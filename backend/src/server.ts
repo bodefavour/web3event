@@ -1,11 +1,11 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import { prisma } from './utils/prisma';
 
 // Load environment variables
 dotenv.config();
@@ -22,14 +22,13 @@ import analyticsRoutes from './routes/analytics';
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
 
-// Database connection
-const connectDB = async () => {
+// Database connection check
+const checkDB = async () => {
     try {
-        const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/web3event';
-        await mongoose.connect(mongoURI);
-        console.log('✅ MongoDB connected successfully');
+        await prisma.$connect();
+        console.log('✅ PostgreSQL connected successfully via Prisma');
     } catch (error) {
-        console.error('❌ MongoDB connection error:', error);
+        console.error('❌ Database connection error:', error);
         process.exit(1);
     }
 };
@@ -108,7 +107,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 // Start server
 const startServer = async () => {
-    await connectDB();
+    await checkDB();
 
     app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
@@ -117,5 +116,16 @@ const startServer = async () => {
 };
 
 startServer();
+
+// Cleanup on shutdown
+process.on('SIGINT', async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+});
 
 export default app;

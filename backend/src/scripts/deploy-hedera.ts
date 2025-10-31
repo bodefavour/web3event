@@ -6,10 +6,7 @@ import {
     FileAppendTransaction,
     ContractCreateTransaction,
     ContractFunctionParameters,
-    Hbar,
 } from '@hashgraph/sdk';
-import * as fs from 'fs';
-import * as path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();

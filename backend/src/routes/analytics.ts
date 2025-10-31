@@ -173,7 +173,7 @@ router.get('/host/:hostId', async (req: Request, res: Response) => {
             const eventRevenue = transactions
                 .filter(t => t.eventId === event.id)
                 .reduce((sum, t) => sum + t.amount, 0);
-            
+
             return {
                 id: event.id,
                 title: event.title,

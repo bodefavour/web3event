@@ -5,6 +5,8 @@ export type ThemePalette = {
     textPrimary: string;
     textMuted: string;
     textOnPrimary: string;
+    text: string;
+    textSecondary: string;
     primary: string;
     primaryHover: string;
     border: string;
@@ -12,6 +14,7 @@ export type ThemePalette = {
     heroGradient: readonly [string, string];
     heroShadow: string;
     success: string;
+    error: string;
 };
 
 const light: ThemePalette = {
@@ -21,13 +24,16 @@ const light: ThemePalette = {
     textPrimary: '#101828',
     textMuted: '#475467',
     textOnPrimary: '#FFFFFF',
+    text: '#101828',
+    textSecondary: '#475467',
     primary: '#3F5CFF',
     primaryHover: '#536EFF',
     border: 'rgba(16, 24, 40, 0.12)',
     glass: 'rgba(16, 24, 40, 0.04)',
     heroGradient: ['rgba(137, 108, 255, 0.95)', 'rgba(137, 108, 255, 0.45)'] as const,
     heroShadow: 'rgba(137, 108, 255, 0.32)',
-    success: '#10B981'
+    success: '#10B981',
+    error: '#EF4444'
 };
 
 const dark: ThemePalette = {
@@ -37,13 +43,16 @@ const dark: ThemePalette = {
     textPrimary: '#FFFFFF',
     textMuted: 'rgba(255, 255, 255, 0.64)',
     textOnPrimary: '#FFFFFF',
+    text: '#FFFFFF',
+    textSecondary: 'rgba(255, 255, 255, 0.64)',
     primary: '#3F5CFF',
     primaryHover: '#536EFF',
     border: 'rgba(255, 255, 255, 0.16)',
     glass: 'rgba(255, 255, 255, 0.06)',
     heroGradient: ['rgba(123, 92, 255, 0.9)', 'rgba(123, 92, 255, 0.35)'] as const,
     heroShadow: 'rgba(46, 17, 120, 0.55)',
-    success: '#10B981'
+    success: '#10B981',
+    error: '#EF4444'
 };
 
 export const palette = {

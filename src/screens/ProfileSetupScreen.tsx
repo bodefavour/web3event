@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View, Pressable } from 'react-native';
+import { ScrollView, StyleSheet, View, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Feather } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -83,14 +84,14 @@ export const ProfileSetupScreen = ({ onBack, onComplete, walletAddress }: Props)
 
                 <View style={styles.sectionHeading}>
                     <ThemedText variant="subtitle" tone="primary">
-                        Wallet
+                        Connected Wallet
                     </ThemedText>
                 </View>
 
                 <ListRow
-                    icon={<Feather name="credit-card" size={20} color={palette.textPrimary} />}
-                    title={walletAddress ?? '0x123...456P'}
-                    subtitle="Connected"
+                    icon={<Feather name="check-circle" size={20} color={palette.success} />}
+                    title={walletAddress || 'No wallet connected'}
+                    subtitle={walletAddress ? "Connected" : "Not connected"}
                 />
 
                 <AppButton

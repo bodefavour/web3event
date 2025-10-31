@@ -158,19 +158,19 @@ router.post(
                 });
             }
 
-            const { 
+            const {
                 hostId,
-                title, 
-                description, 
-                category, 
-                venue, 
-                address, 
-                city, 
+                title,
+                description,
+                category,
+                venue,
+                address,
+                city,
                 country,
                 latitude,
                 longitude,
-                startDate, 
-                endDate, 
+                startDate,
+                endDate,
                 image,
                 ticketTypes,
                 status
