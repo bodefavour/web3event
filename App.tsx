@@ -7,9 +7,10 @@ global.process = require('process');
 global.process.env = global.process.env || {};
 
 // Initialize Coinbase Wallet SDK
-import { initializeCoinbaseWalletSDK } from '@coinbase/wallet-mobile-sdk';
+// Note: Coinbase Wallet SDK initialization may not be required or uses a different method
+// import { initializeCoinbaseWalletSDK } from '@coinbase/wallet-mobile-sdk';
 
-initializeCoinbaseWalletSDK();
+// initializeCoinbaseWalletSDK();
 
 import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
 import { useCallback, useState, useEffect } from 'react';
@@ -253,7 +254,7 @@ function AppContent() {
     }, []);
 
     const handleSwitchRole = useCallback(() => {
-        setUserRole((prev) => (prev === 'host' ? 'attendee' : 'host'));
+        setUserRole((prev: string) => (prev === 'host' ? 'attendee' : 'host'));
     }, []);
 
     const handleBackToWelcome = useCallback(() => {
@@ -376,7 +377,7 @@ function AppContent() {
         []
     );
 
-    const totalTickets = ticketDraft?.reduce((sum, ticket) => sum + (parseInt(ticket.quantity, 10) || 0), 0) ?? 0;
+    const totalTickets = ticketDraft?.reduce((sum: number, ticket: { quantity: string; }) => sum + (parseInt(ticket.quantity, 10) || 0), 0) ?? 0;
     const rawPrimaryPrice = ticketDraft?.[0]?.price?.trim();
     const primaryTicketPrice = rawPrimaryPrice
         ? rawPrimaryPrice.startsWith('$')

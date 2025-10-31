@@ -25,13 +25,27 @@ config.resolver.extraNodeModules = {
     dgram: false,
 };
 
-// Exclude problematic server-side modules from being bundled
+// Deduplicate native modules by resolving to the root version
 config.resolver.resolveRequest = (context, moduleName, platform) => {
     // Exclude ws (WebSocket) server implementation
     if (moduleName === 'ws' || moduleName.includes('websocket-server')) {
         return {
             type: 'empty',
         };
+    }
+
+    // Deduplicate native modules - always use root node_modules version
+    if (
+        moduleName === '@coinbase/wallet-mobile-sdk' ||
+        moduleName === 'react-native-mmkv' ||
+        moduleName === 'react-native-get-random-values' ||
+        moduleName === 'expo-file-system'
+    ) {
+        return context.resolveRequest(
+            { ...context, originModulePath: context.projectRoot },
+            moduleName,
+            platform
+        );
     }
 
     // Use default resolution for everything else
