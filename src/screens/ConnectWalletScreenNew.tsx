@@ -1,13 +1,12 @@
-import { StyleSheet, View, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, View, Pressable, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { useThemePalette } from '@/hooks/useThemePalette';
 import { spacing } from '@/theme';
 import { Feather } from '@expo/vector-icons';
-import { ConnectWallet, useAddress, useDisconnect, useSDK } from '@thirdweb-dev/react-native';
 import apiService from '@/services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
