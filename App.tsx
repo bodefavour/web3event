@@ -1,7 +1,15 @@
 import 'react-native-get-random-values';
+
+// Polyfills for Node.js modules required by ThirdWeb
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
+global.process = require('process');
+global.process.env = global.process.env || {};
+
 import { ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native';
 import { useCallback, useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThirdwebProvider } from '@thirdweb-dev/react-native';
 import apiService from '@/services/api';
 import {
     useFonts,
@@ -693,9 +701,14 @@ function AppContent() {
 
 export default function App() {
     return (
-        <SafeAreaProvider>
-            <AppContent />
-        </SafeAreaProvider>
+        <ThirdwebProvider
+            activeChain="ethereum"
+            clientId="your-client-id" // You'll need to get this from https://thirdweb.com/dashboard
+        >
+            <SafeAreaProvider>
+                <AppContent />
+            </SafeAreaProvider>
+        </ThirdwebProvider>
     );
 }
 
