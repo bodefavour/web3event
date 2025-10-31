@@ -19,7 +19,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (user: any) =>
         setLoading(true);
         try {
             const response = await apiService.login(email, password);
-            
+
             if (response.success) {
                 Alert.alert('Success', 'Login successful!');
                 onLoginSuccess(response.data.user);
@@ -34,7 +34,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (user: any) =>
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Login</Text>
-            
+
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -43,7 +43,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (user: any) =>
                 keyboardType="email-address"
                 autoCapitalize="none"
             />
-            
+
             <TextInput
                 style={styles.input}
                 placeholder="Password"
@@ -51,7 +51,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (user: any) =>
                 onChangeText={setPassword}
                 secureTextEntry
             />
-            
+
             <TouchableOpacity
                 style={styles.button}
                 onPress={handleLogin}
@@ -69,7 +69,7 @@ export function LoginScreen({ onLoginSuccess }: { onLoginSuccess: (user: any) =>
 export async function loadEvents(filters?: any) {
     try {
         const response = await apiService.getEvents(filters);
-        
+
         if (response.success) {
             return response.data.events;
         }
@@ -87,7 +87,7 @@ export async function createNewEvent(eventData: any, hostId: string) {
             ...eventData,
             host: hostId,
         });
-        
+
         if (response.success) {
             Alert.alert('Success', 'Event created successfully!');
             return response.data.event;
@@ -108,7 +108,7 @@ export async function purchaseTicket(
     try {
         // 1. Create transaction on Hedera (you'll implement this with Hedera SDK on frontend)
         const mockTransactionHash = 'hedera-tx-' + Date.now(); // Replace with real Hedera tx
-        
+
         // 2. Call backend API to create ticket
         const response = await apiService.purchaseTicket({
             eventId,
@@ -117,7 +117,7 @@ export async function purchaseTicket(
             quantity,
             transactionHash: mockTransactionHash,
         });
-        
+
         if (response.success) {
             Alert.alert('Success', 'Ticket purchased successfully!');
             return response.data.ticket;
@@ -132,7 +132,7 @@ export async function purchaseTicket(
 export async function loadUserTickets(userId: string) {
     try {
         const response = await apiService.getUserTickets(userId);
-        
+
         if (response.success) {
             return response.data.tickets;
         }
@@ -147,7 +147,7 @@ export async function loadUserTickets(userId: string) {
 export async function loadEventAnalytics(eventId: string) {
     try {
         const response = await apiService.getEventAnalytics(eventId);
-        
+
         if (response.success) {
             return response.data;
         }

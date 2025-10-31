@@ -2,7 +2,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Backend URL - Update this based on your environment
-const API_BASE_URL = __DEV__ 
+const API_BASE_URL = __DEV__
   ? 'http://localhost:5000/api'  // Development
   : 'https://your-production-api.com/api';  // Production
 
@@ -55,7 +55,7 @@ class APIService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...(this.token && { Authorization: `Bearer ${this.token}` }),
@@ -116,12 +116,12 @@ class APIService {
       name,
       role,
     });
-    
+
     if (response.data?.token) {
       await this.setToken(response.data.token);
       await AsyncStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
     }
-    
+
     return response;
   }
 
@@ -130,12 +130,12 @@ class APIService {
       email,
       password,
     });
-    
+
     if (response.data?.token) {
       await this.setToken(response.data.token);
       await AsyncStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
     }
-    
+
     return response;
   }
 

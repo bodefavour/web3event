@@ -149,7 +149,7 @@ const MY_TICKETS: TicketItem[] = [
 
 function AppContent() {
     const palette = useThemePalette();
-    
+
     // Initialize API service on mount
     useEffect(() => {
         apiService.initialize();

@@ -72,11 +72,11 @@ app.use('/api', limiter);
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
+    res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+    });
 });// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -88,10 +88,10 @@ app.use('/api/analytics', analyticsRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-  });
+    res.status(404).json({
+        success: false,
+        message: 'Route not found',
+    });
 });// Error handling middleware
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     console.error('Error:', err);
