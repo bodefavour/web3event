@@ -142,9 +142,9 @@ export const ConnectWalletScreen = ({ onBack, onSelectWallet }: Props) => {
                 Alert.alert('Error', 'User not logged in. Please login first.');
                 return;
             }
-            
+
             const user = JSON.parse(userData);
-            
+
             // Save wallet to backend
             await apiService.connectWallet(walletAddress, user.id);
 
